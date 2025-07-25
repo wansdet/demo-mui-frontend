@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router'
 import { Alert, Checkbox, FormControlLabel } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -16,7 +16,7 @@ const SignIn = () => {
     const navigate = useNavigate()
     const location = useLocation()
     const from = location.state?.from?.pathname || '/'
-    const title: string = 'Sign in'
+    const title = 'Sign in'
     const { login } = useContext(SecurityContext)
     const { hideLoading } = useContext(ApplicationContext)
     const formOptions = { resolver: yupResolver(userCredentialsSchema) }
@@ -26,7 +26,7 @@ const SignIn = () => {
     useEffect(() => {
         // Hide loading indicator when SignIn component is mounted in case of 401 redirect
         hideLoading()
-    }, [])
+    }, [hideLoading])
 
     const {
         handleSubmit,
@@ -55,59 +55,59 @@ const SignIn = () => {
         }
     }
 
-    return (
-        <React.Fragment>
-            <SignInTemplate title={title}>
-                <form
-                    onSubmit={handleSubmit(onSubmit)}
-                    data-testid="sign-in-form"
-                >
-                    {invalidCredentials && (
-                        <Alert
-                            data-testid="sign-in-error"
-                            severity="error"
-                            sx={{ mt: 3, mb: 3 }}
-                        >
-                            {errorMessage}
-                        </Alert>
-                    )}
-                    <FormInputText
-                        data-test="email-input"
-                        name="email"
-                        control={control}
-                        label="Email"
-                        type="email"
-                        errors={errors}
-                    />
-                    <FormInputText
-                        data-test="password-input"
-                        name="password"
-                        control={control}
-                        label="Password"
-                        type="password"
-                        errors={errors}
-                    />
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                data-testid="remember-me-checkbox"
-                                value="remember"
-                                color="primary"
-                            />
-                        }
-                        label="Remember me"
-                    />
-                    <ButtonSubmit
-                        data-testid="sign-in-submit-button"
-                        fullWidth
-                        sx={{ mt: 3, mb: 2 }}
+return (
+        <SignInTemplate title={title}>
+            <form
+                onSubmit={handleSubmit(onSubmit)}
+                data-testid="sign-in-form"
+            >
+                {invalidCredentials && (
+                    <Alert
+                        data-testid="sign-in-error-alert"
+                        severity="error"
+                        sx={{ mt: 3, mb: 3 }}
                     >
-                        Sign In
-                    </ButtonSubmit>
-                    <SignInHelper />
-                </form>
-            </SignInTemplate>
-        </React.Fragment>
+                        {errorMessage}
+                    </Alert>
+                )}
+                <FormInputText
+                    data-test="email-input"
+                    name="email"
+                    control={control}
+                    label="Email"
+                    type="email"
+                    errors={errors}
+                />
+                <FormInputText
+                    data-test="password-input"
+                    name="password"
+                    control={control}
+                    label="Password"
+                    type="password"
+                    errors={errors}
+                />
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            id="remember-me-checkbox"
+                            data-testid="remember-me-checkbox"
+                            name="rememberMe"
+                            value="rememberMe"
+                            color="primary"
+                        />
+                    }
+                    label="Remember me"
+                />
+                <ButtonSubmit
+                    data-testid="sign-in-submit-btn"
+                    fullWidth
+                    sx={{ mt: 3, mb: 2 }}
+                >
+                    Sign In
+                </ButtonSubmit>
+                <SignInHelper />
+            </form>
+        </SignInTemplate>
     )
 }
 

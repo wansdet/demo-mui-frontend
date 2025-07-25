@@ -3,10 +3,10 @@
  * Guard the routes that require authentication
  */
 import * as React from 'react'
-import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router'
 
-import { SecurityContext } from './SecurityContext'
 import { PATH_SIGN_IN } from '@/core/application'
+import { SecurityContext } from './SecurityContext'
 
 export const ProtectedRoutes = () => {
     const auth = React.useContext(SecurityContext)

@@ -1,8 +1,6 @@
 import type { IOption } from '@/common'
 
 export const getOptionByValue = (
-    value: string,
+    value: string | undefined,
     options: IOption[]
-): IOption => {
-    return <IOption>options.find((option) => option.value === value)
-}
+): IOption => <IOption>options.find((option) => option.value === value)

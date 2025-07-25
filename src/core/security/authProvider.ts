@@ -43,7 +43,7 @@ export const authProvider = {
         }
 
         return {
-            username: username,
+            username,
             roles: [role],
         }
     },
@@ -61,8 +61,7 @@ export const authProvider = {
 
         if (user && user.token) {
             return { Authorization: `Bearer ${user.token}` }
-        } else {
-            return {}
         }
+        return {}
     },
 }

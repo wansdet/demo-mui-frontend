@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import {
     Card,
     CardActionArea,
@@ -21,9 +21,8 @@ interface IBlogPostsCardListProps {
     blogPosts: IBlogPost[]
 }
 
-const BlogPostsCardList = ({ blogPosts }: IBlogPostsCardListProps) => {
-    return (
-        <React.Fragment>
+const BlogPostsCardList = ({ blogPosts }: IBlogPostsCardListProps) => (
+        <>
             {blogPosts.map((blogPost: IBlogPost) => (
                 <CardActionArea
                     data-test="blog-posts-card-action-area"
@@ -31,7 +30,7 @@ const BlogPostsCardList = ({ blogPosts }: IBlogPostsCardListProps) => {
                     to={`${PATH_BLOG_POST}/${blogPost.blogPostId}`}
                     key={blogPost.blogPostId}
                 >
-                    <Card variant={'outlined'} sx={{ mb: 10 }}>
+                    <Card variant="outlined" sx={{ mb: 10 }}>
                         <CardMedia
                             component="img"
                             sx={{
@@ -92,8 +91,7 @@ const BlogPostsCardList = ({ blogPosts }: IBlogPostsCardListProps) => {
                     </Card>
                 </CardActionArea>
             ))}
-        </React.Fragment>
+        </>
     )
-}
 
 export default BlogPostsCardList

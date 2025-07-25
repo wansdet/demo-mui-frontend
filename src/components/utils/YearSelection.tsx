@@ -18,8 +18,7 @@ const YearSelection = ({
     years,
     selectedYear,
     onChange,
-}: IYearSelectionProps) => {
-    return (
+}: IYearSelectionProps) => (
         <FormControl
             data-testid="year-selection"
             component="fieldset"
@@ -47,6 +46,5 @@ const YearSelection = ({
             </RadioGroup>
         </FormControl>
     )
-}
 
 export default YearSelection

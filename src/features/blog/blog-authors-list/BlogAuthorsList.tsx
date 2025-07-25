@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Button, List, ListItem } from '@mui/material'
 
 import { API_URL_BLOG_AUTHORS } from '@/core/application'
@@ -23,7 +23,7 @@ const BlogAuthorsList = () => {
     }, [fetchedBlogAuthors])
 
     return (
-        <React.Fragment>
+        <>
             <H3 data-testid="blog-authors-heading">BLOG AUTHORS</H3>
             <List
                 data-testid="blog-authors-list"
@@ -40,7 +40,7 @@ const BlogAuthorsList = () => {
                             style={{ textDecoration: 'none' }}
                         >
                             <Button
-                                data-test="blog-author-button"
+                                data-test="blog-author-btn"
                                 variant="text"
                                 sx={{ pl: 0 }}
                             >
@@ -50,7 +50,7 @@ const BlogAuthorsList = () => {
                     </ListItem>
                 ))}
             </List>
-        </React.Fragment>
+        </>
     )
 }
 

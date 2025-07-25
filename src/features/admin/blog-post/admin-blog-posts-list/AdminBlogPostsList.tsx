@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import {
     Button,
     Container,
@@ -11,7 +11,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import PublishIcon from '@mui/icons-material/Publish'
 import VisibilityIcon from '@mui/icons-material/Visibility'
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridPaginationModel } from '@mui/x-data-grid'
 
 import {
     ApplicationContext,
@@ -28,7 +28,6 @@ import { ConfirmDialog } from '@/components/utils'
 
 const AdminBlogPostsList = () => {
     const [blogPosts, setBlogPosts] = useState<any[]>([])
-    const [pageSize, setPageSize] = useState(10)
     const [selectedBlogPost, setSelectedBlogPost] = useState<any | null>(null)
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
     const title = 'Manage Blog Posts'
@@ -49,6 +48,11 @@ const AdminBlogPostsList = () => {
     const { showLoading, hideLoading } = useContext(ApplicationContext)
     const { showNotification, NotificationComponent } = useNotification()
     const navigate = useNavigate()
+
+    const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+        pageSize: 100,
+        page: 0,
+    })
 
     useEffect(() => {
         if (fetchedBlogPosts) {
@@ -74,9 +78,6 @@ const AdminBlogPostsList = () => {
             ? `${API_URL_BLOG_POSTS}/${selectedBlogPost.blogPostId}`
             : ''
     )
-    useEffect(() => {
-        setPageSize(10)
-    }, [])
 
     useEffect(() => {
         if (getLoading) {
@@ -84,7 +85,7 @@ const AdminBlogPostsList = () => {
         } else {
             hideLoading()
         }
-    }, [getLoading])
+    }, [getLoading, hideLoading, showLoading])
 
     useEffect(() => {
         if (postExportLoading) {
@@ -92,7 +93,7 @@ const AdminBlogPostsList = () => {
         } else {
             hideLoading()
         }
-    }, [postExportLoading])
+    }, [hideLoading, postExportLoading, showLoading])
 
     const handleShowBlogPost = (params: any, event: any) => {
         navigate(`/admin/blog-posts/blog-post-show/${params.id}`)
@@ -158,43 +159,33 @@ const AdminBlogPostsList = () => {
 
     const renderBlogPostStatus = (props: any) => {
         return (
-            <React.Fragment>
-                {props.value ? (
-                    <ChipStatus
-                        id="status"
-                        statusValue={props.value}
-                        statuses={blogPostStatuses}
-                        size="small"
-                    />
-                ) : (
-                    ''
-                )}
-            </React.Fragment>
+            props.value ? (
+                <ChipStatus
+                    id="status"
+                    statusValue={props.value}
+                    statuses={blogPostStatuses}
+                    size="small"
+                />
+            ) : (
+                ''
+            )
         )
     }
 
     const renderBlogPostActions = (props: any) => {
         return (
-            <React.Fragment>
+            <>
                 <Tooltip title={`View blog post ${props.row.blogPostId}`}>
                     <IconButton
-                        data-test="blog-post-show-button"
+                        data-test="blog-post-show-btn"
                         onClick={(event) => handleShowBlogPost(props, event)}
                     >
                         <VisibilityIcon aria-label="show" color="success" />
                     </IconButton>
                 </Tooltip>
-                {/*<Tooltip title={`Edit blog post ${props.row.blogPostId}`}>
-                    <IconButton
-                        data-test="blog-post-edit-button"
-                        onClick={(event) => handleEditBlogPost(props, event)}
-                    >
-                        <EditIcon aria-label="edit" color="primary" />
-                    </IconButton>
-                </Tooltip>*/}
                 <Tooltip title={`Manage blog post ${props.row.blogPostId}`}>
                     <IconButton
-                        data-test="blog-post-manage-button"
+                        data-test="blog-post-manage-btn"
                         onClick={(event) => handleManageBlogPost(props, event)}
                     >
                         <EditIcon aria-label="manage" color="primary" />
@@ -203,7 +194,7 @@ const AdminBlogPostsList = () => {
                 {props.row.status === 'archived' && (
                     <Tooltip title={`Delete blog post ${props.row.blogPostId}`}>
                         <IconButton
-                            data-test="blog-post-delete-button"
+                            data-test="blog-post-delete-btn"
                             onClick={(event) =>
                                 handleDeleteBlogPost(props, event)
                             }
@@ -212,7 +203,7 @@ const AdminBlogPostsList = () => {
                         </IconButton>
                     </Tooltip>
                 )}
-            </React.Fragment>
+            </>
         )
     }
 
@@ -236,19 +227,19 @@ const AdminBlogPostsList = () => {
     ]
 
     return (
-        <React.Fragment>
+        <>
             <Container
                 data-testid="admin-blog-posts-list-content"
                 maxWidth="lg"
                 component="main"
                 sx={{ pt: 0, pb: 8 }}
             >
-                <H1 variant="h3" data-testid="page-heading">
+                <H1 variant="h3" className="page-heading" data-testid="manage-blog-posts-heading">
                     {title}
                 </H1>
                 <div>
                     <Button
-                        data-testid="blog-posts-export-button"
+                        id="manage-blog-posts-export-btn"
                         variant="contained"
                         onClick={() => handleBlogPostsExport()}
                     >
@@ -258,16 +249,17 @@ const AdminBlogPostsList = () => {
                 </div>
                 <div data-test="data-grid" style={{ width: '100%' }}>
                     <DataGrid
-                        autoHeight={true}
+                        data-testid="manage-blog-posts-data-table"
+                        autoHeight
                         rows={blogPosts}
                         columns={blogPostsDataGridColumns}
                         pagination
                         getRowId={(row) => row.blogPostId}
-                        rowsPerPageOptions={[5, 10, 20, 50, 100]}
-                        pageSize={pageSize}
-                        onPageSizeChange={(newPageSize) =>
-                            setPageSize(newPageSize)
-                        }
+                        pageSizeOptions={[5, 10, 20, 50, 100]}
+                        paginationModel={paginationModel}
+                        onPaginationModelChange={(model: GridPaginationModel) => {
+                            setPaginationModel(model)
+                        }}
                         sx={{ mt: 6, backgroundColor: 'background.paper' }}
                     />
                 </div>
@@ -309,7 +301,7 @@ const AdminBlogPostsList = () => {
                 <NotificationComponent />
             </Container>
             <AdminFooter />
-        </React.Fragment>
+        </>
     )
 }
 

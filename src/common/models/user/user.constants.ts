@@ -5,6 +5,15 @@ export const genderOptions: IOption[] = [
     { value: 'male', label: 'Male' },
 ]
 
+export const titleOptions: IOption[] = [
+    { value: 'Mr', label: 'Mr' },
+    { value: 'Mrs', label: 'Mrs' },
+    { value: 'Miss', label: 'Miss' },
+    { value: 'Ms', label: 'Ms' },
+    { value: 'Dr', label: 'Dr' },
+    { value: 'Prof', label: 'Prof' },
+]
+
 export const userRoles: IOption[] = [
     { value: 'ROLE_ADMIN', label: 'Admin' },
     { value: 'ROLE_USER', label: 'User' },

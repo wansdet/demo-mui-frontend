@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import Axios from 'axios'
 
 import { Container, IconButton, Tooltip, Typography } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridPaginationModel } from '@mui/x-data-grid'
 
 import { SecurityContext } from '@/core/security'
 import {
@@ -17,13 +17,12 @@ import { useApiDelete, useApiGet } from '@/core/api'
 import { AdminFooter } from '@/core/layout'
 import useNotification from '@/common/hooks/feedback/useNotification'
 import { IDocument } from '@/common/models/document'
-import { H1 } from '@/components/data-display'
+import { Heading } from '@/components/data-display'
 import { ConfirmDialog } from '@/components/utils'
 import EditIcon from '@mui/icons-material/Edit'
 
 const DocumentsList = () => {
     const [documents, setDocuments] = useState<any[]>([])
-    const [pageSize, setPageSize] = useState(10)
     const [selectedDocument, setSelectedDocument] = useState<any | null>(null)
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
 
@@ -32,6 +31,11 @@ const DocumentsList = () => {
 
     const title = 'My Documents'
     document.title = `${title} | Admin | ${APP_NAME}`
+
+    const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+        pageSize: 100,
+        page: 0,
+    })
 
     const {
         data: fetchedDocuments,
@@ -64,20 +68,16 @@ const DocumentsList = () => {
     }, [fetchedDocuments])
 
     useEffect(() => {
-        setPageSize(10)
-    }, [])
-
-    useEffect(() => {
         if (getLoading) {
             showLoading()
         } else {
             hideLoading()
         }
-    }, [getLoading])
+    }, [getLoading, hideLoading, showLoading])
 
     const handleDocumentDownload = (params: any, event: any) => {
         const downloadUrl = `${API_URL_DOCUMENTS}/${params.row.id}/download`
-        const filename = params.row.filename
+        const {filename} = params.row
 
         Axios.get(downloadUrl, {
             headers,
@@ -147,10 +147,10 @@ const DocumentsList = () => {
 
     const renderDocumentActions = (props: any) => {
         return (
-            <React.Fragment>
+            <>
                 <Tooltip title={`Download document ${props.row.blogPostId}`}>
                     <IconButton
-                        data-test="document-download-button"
+                        data-test="document-download-btn"
                         onClick={(event) =>
                             handleDocumentDownload(props, event)
                         }
@@ -160,13 +160,13 @@ const DocumentsList = () => {
                 </Tooltip>
                 <Tooltip title={`Delete document ${props.row.id}`}>
                     <IconButton
-                        data-test="document-delete-button"
+                        data-test="document-delete-btn"
                         onClick={(event) => handleDeleteDocument(props, event)}
                     >
                         <DeleteIcon aria-label="delete" color="error" />
                     </IconButton>
                 </Tooltip>
-            </React.Fragment>
+            </>
         )
     }
 
@@ -182,28 +182,26 @@ const DocumentsList = () => {
     ]
 
     return (
-        <React.Fragment>
+        <>
             <Container
                 data-testid="admin-documents-list-content"
                 maxWidth="lg"
                 component="main"
                 sx={{ pt: 0, pb: 8 }}
             >
-                <H1 variant="h3" data-testid="page-heading">
-                    {title}
-                </H1>
+                <Heading className="page-heading" data-testid="my-documents-heading">{title}</Heading>
                 <div data-test="data-grid" style={{ width: '100%' }}>
                     <DataGrid
-                        autoHeight={true}
+                        autoHeight
                         rows={documents}
                         columns={documentsDataGridColumns}
                         pagination
                         getRowId={(row) => row.id}
-                        rowsPerPageOptions={[5, 10, 20, 50, 100]}
-                        pageSize={pageSize}
-                        onPageSizeChange={(newPageSize) =>
-                            setPageSize(newPageSize)
-                        }
+                        pageSizeOptions={[5, 10, 20, 50, 100]}
+                        paginationModel={paginationModel}
+                        onPaginationModelChange={(model: GridPaginationModel) => {
+                            setPaginationModel(model)
+                        }}
                         sx={{ mt: 6, backgroundColor: 'background.paper' }}
                     />
                 </div>
@@ -245,7 +243,7 @@ const DocumentsList = () => {
                 <NotificationComponent />
             </Container>
             <AdminFooter />
-        </React.Fragment>
+        </>
     )
 }
 

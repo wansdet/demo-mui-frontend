@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Box, Container } from '@mui/material'
-// import { PieChart } from '@mui/x-charts'
+import { PieChart } from '@mui/x-charts'
 
 import { useApiGet } from '@/core/api'
 import { AdminFooter } from '@/core/layout'
@@ -14,7 +14,7 @@ import {
     IBlogPostCategory,
 } from '@/common/models/blog'
 import { IPieChartSeriesData } from '@/common/models/chart'
-import { H1, Paragraph } from '@/components/data-display'
+import { H1 } from '@/components/data-display'
 import { YearSelection } from '@/components/utils'
 
 const BlogPostsAnnualCategories = () => {
@@ -26,7 +26,7 @@ const BlogPostsAnnualCategories = () => {
         new Date().getFullYear()
     )
     const [series, setSeries] = useState<IPieChartSeriesData[]>([])
-    const title = 'Annual Blog Posts by Categories Report'
+    const title = 'Annual Blog Posts by Categories'
 
     document.title = `${title} | Admin | ${APP_NAME}`
 
@@ -62,7 +62,7 @@ const BlogPostsAnnualCategories = () => {
         } else {
             hideLoading()
         }
-    }, [getLoading])
+    }, [getLoading, hideLoading, showLoading])
 
     useEffect(() => {
         const selectedYearData = annualBlogPosts.find(
@@ -93,25 +93,21 @@ const BlogPostsAnnualCategories = () => {
     }
 
     return (
-        <React.Fragment>
+        <>
             <Container
-                data-testid="blog-posts-annual-categories-content"
+                data-testid="annual-blog-posts-categories-content"
                 maxWidth="lg"
                 sx={{ pt: 8, pb: 8 }}
             >
-                <H1 variant="h3" data-testid="page-heading">
+                <H1 variant="h3" className="page-heading" data-testid="annual-blog-posts-categories-heading">
                     {title}
                 </H1>
-                <Paragraph>
-                    TODO: Replace MUI x-charts with another library to avoid
-                    Popper issue.
-                </Paragraph>
                 <YearSelection
                     years={years}
                     selectedYear={selectedYear}
                     onChange={handleYearChange}
                 />
-                {/*{series.length > 0 && (
+                {series.length > 0 && (
                     <Box
                         data-testid="blog-posts-annual-categories-chart"
                         sx={{
@@ -130,10 +126,10 @@ const BlogPostsAnnualCategories = () => {
                             sx={{ width: '100%', height: '100%' }}
                         />
                     </Box>
-                )}*/}
+                )}
             </Container>
             <AdminFooter />
-        </React.Fragment>
+        </>
     )
 }
 

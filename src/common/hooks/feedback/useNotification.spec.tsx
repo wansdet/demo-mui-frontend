@@ -37,11 +37,12 @@ describe('useNotification hook', () => {
         fireEvent.click(showButton)
 
         const notificationElement = queryByText('Test Message')
-        expect(notificationElement).toBeInTheDocument()
+        expect(notificationElement).to.not.be.null
+        expect(notificationElement?.textContent).to.include('Test Message')
 
         fireEvent.click(hideButton)
 
         const hiddenNotificationElement = queryByText('Test Message')
-        expect(hiddenNotificationElement).not.toBeInTheDocument()
+        expect(hiddenNotificationElement).to.be.null
     })
 })

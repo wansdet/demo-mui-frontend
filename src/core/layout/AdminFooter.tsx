@@ -1,6 +1,6 @@
 import React from 'react'
-import { Box, Link, Typography } from '@mui/material'
-import { styled, SxProps } from '@mui/system'
+import { Box, Typography } from '@mui/material'
+import { SxProps } from '@mui/system'
 import { merge } from 'lodash'
 
 type IProps = {

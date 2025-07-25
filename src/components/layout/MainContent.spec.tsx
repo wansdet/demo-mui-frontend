@@ -7,6 +7,7 @@ describe('MainContent Component', () => {
         const testText = 'Main Content Test'
         const { getByText } = render(<MainContent>{testText}</MainContent>)
         const renderedText = getByText(testText)
-        expect(renderedText).toBeInTheDocument()
+        expect(renderedText).to.not.be.null
+        expect(renderedText?.textContent).to.equal(testText)
     })
 })

@@ -2,6 +2,7 @@ import React from 'react'
 import { render, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import RadioGroupGrid from './RadioGroupGrid'
+import { vi } from 'vitest'
 
 const mockProps = {
     labelGroup: 'Test Group',
@@ -18,27 +19,27 @@ const mockProps = {
 describe('RadioGroupGrid Component', () => {
     it('renders correctly with the provided props', () => {
         const { getByLabelText, getByText } = render(
-            <RadioGroupGrid {...mockProps} />
+            <RadioGroupGrid {...mockProps} />,
         )
 
         const labelElement = getByText(mockProps.labelGroup)
-        expect(labelElement).toBeInTheDocument()
+        expect(labelElement).to.not.be.null
 
         const radioGroupElement = getByLabelText(
             `radio-group-label-${mockProps.labelGroup
                 .toLowerCase()
-                .replace(/\s+/g, '_')}`
+                .replace(/\s+/g, '_')}`,
         )
-        expect(radioGroupElement).toBeInTheDocument()
+        expect(radioGroupElement).to.not.be.null
 
         // Check if the "All" radio button is rendered
         const allRadioElement = getByLabelText(mockProps.labelAll)
-        expect(allRadioElement).toBeInTheDocument()
+        expect(allRadioElement).to.not.be.null
 
         // Check if all radio buttons from the radios array are rendered
         mockProps.radios.forEach((radio) => {
             const radioElement = getByLabelText(radio.label)
-            expect(radioElement).toBeInTheDocument()
+            expect(radioElement).to.not.be.null
         })
     })
 
@@ -50,8 +51,9 @@ describe('RadioGroupGrid Component', () => {
         fireEvent.click(radio1Element)
 
         // Check if the onChange handler is called with the correct value
-        expect(mockProps.onChange).toHaveBeenCalledTimes(1)
-        expect(mockProps.onChange).toHaveBeenCalledWith(expect.any(Object))
+        expect(mockProps.onChange).to.have.been.calledOnce
+        // @ts-ignore
+        expect(mockProps.onChange).to.have.been.calledWith(expect.any(Object))
     })
 
     it('selects the correct radio button when a radio button is clicked', () => {
@@ -62,6 +64,6 @@ describe('RadioGroupGrid Component', () => {
         fireEvent.click(radio2Element)
 
         // Check if the "Radio 2" radio button is selected
-        expect(radio2Element).toBeChecked()
+        expect(radio2Element).to.be.checked()
     })
 })

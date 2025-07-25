@@ -5,7 +5,7 @@ import CardContent from '@mui/material/CardContent'
 import CardMedia from '@mui/material/CardMedia'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
 interface ILink {
     url: string
@@ -23,7 +23,7 @@ const FeaturedCard = (props: IFeaturedCardProps) => {
     const { title, description, image, link } = props
 
     return (
-        <Grid item xs={12} md={12}>
+        <Grid size={{ xs: 12, md: 12 }}>
             <CardActionArea component={Link} to={link.url}>
                 <Card sx={{ display: 'flex' }}>
                     <CardContent sx={{ flex: 1 }}>

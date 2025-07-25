@@ -41,7 +41,7 @@ const RadioGroupGrid = (props: IRadioGroupGridProps) => {
                 style={{ display: 'flex' }}
             >
                 <Grid container>
-                    <Grid item xs={12} md={3} lg={2}>
+                    <Grid size={{ xs: 12, md: 3, lg: 2 }}>
                         <FormControlLabel
                             data-test="group-radio-label"
                             value=""
@@ -51,7 +51,7 @@ const RadioGroupGrid = (props: IRadioGroupGridProps) => {
                         />
                     </Grid>
                     {radios.map((radio: IRadio) => (
-                        <Grid item xs={12} md={3} lg={2} key={radio.value}>
+                        <Grid size={{ xs: 12, md: 3, lg: 2 }} key={radio.value}>
                             <FormControlLabel
                                 data-test="group-radio-label"
                                 value={radio.value}

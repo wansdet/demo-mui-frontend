@@ -12,7 +12,7 @@ export const homeItems: IListItem[] = [
         label: 'Home',
         path: '/',
         icon: 'home',
-        testId: 'admin-home-button',
+        testId: 'admin-home-btn',
     },
 ]
 
@@ -22,7 +22,7 @@ export const userListItems: IListItem[] = [
         label: 'My Documents',
         path: '/admin/documents/documents-list',
         icon: 'list',
-        testId: 'documents-button',
+        testId: 'my-documents-btn',
     },
 ]
 
@@ -32,7 +32,7 @@ export const bloggerListItems: IListItem[] = [
         label: 'My Blog Posts',
         path: '/admin/blog-posts/blogger-blog-posts-list',
         icon: 'list',
-        testId: 'blogger-blog-posts-button',
+        testId: 'blogger-blog-posts-btn',
     },
 ]
 
@@ -42,14 +42,14 @@ export const adminBlogListItems: IListItem[] = [
         label: 'Blog Posts',
         path: '/admin/blog-posts/blog-posts-list',
         icon: 'list',
-        testId: 'admin-blog-posts-button',
+        testId: 'admin-blog-posts-btn',
     },
     {
         index: 4,
         label: 'Blog Post Comments',
         path: '/admin/blog-posts/blog-post-comments-list',
         icon: 'list',
-        testId: 'admin-blog-post-comments-button',
+        testId: 'admin-blog-post-comments-btn',
     },
 ]
 
@@ -59,37 +59,37 @@ export const adminUsersListItems: IListItem[] = [
         label: 'Users',
         path: '/admin/users/users-list',
         icon: 'people',
-        testId: 'admin-users-button',
+        testId: 'admin-users-btn',
     },
 ]
 
 export const adminReportsListItems: IListItem[] = [
     {
         index: 6,
-        label: 'Monthly Blog Posts by Categories Report',
+        label: 'Monthly Blog Posts by Categories',
         path: '/admin/blog-posts/reports/blog-posts-monthly-categories',
         icon: 'bar-chart',
-        testId: 'admin-blog-posts-monthly-categories-button',
+        testId: 'admin-blog-posts-monthly-categories-btn',
     },
     {
         index: 7,
-        label: 'Monthly Blog Posts by Authors Report',
+        label: 'Monthly Blog Posts by Authors',
         path: '/admin/blog-posts/reports/blog-posts-monthly-authors',
         icon: 'bar-chart',
-        testId: 'admin-blog-posts-monthly-authors-button',
+        testId: 'admin-blog-posts-monthly-authors-btn',
     },
     {
         index: 8,
-        label: 'Annual Blog Posts by Categories Report',
+        label: 'Annual Blog Posts by Categories',
         path: '/admin/blog-posts/reports/blog-posts-annual-categories',
         icon: 'pie-chart',
-        testId: 'admin-blog-posts-annual-categories-button',
+        testId: 'admin-blog-posts-annual-categories-btn',
     },
     {
         index: 9,
-        label: 'Annual Blog Posts by Authors Report',
+        label: 'Annual Blog Posts by Authors',
         path: '/admin/blog-posts/reports/blog-posts-annual-authors',
         icon: 'pie-chart',
-        testId: 'admin-blog-posts-annual-authors-button',
+        testId: 'admin-blog-posts-annual-authors-btn',
     },
 ]

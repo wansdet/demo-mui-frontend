@@ -9,8 +9,8 @@ import {
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 
-interface IConfirmDialogProps<T> {
-    id: string
+interface IConfirmDialogProps {
+    id?: string
     title: string
     children: ReactNode
     open: boolean
@@ -18,24 +18,23 @@ interface IConfirmDialogProps<T> {
     onClose: () => void
 }
 
-const ConfirmDialog = <T extends {}>({
-    id = 'confirm-dialog',
+const ConfirmDialog = <T extends NonNullable<unknown>>({
+    id,
     title,
     children,
     open,
     onConfirm,
     onClose,
-}: IConfirmDialogProps<T>) => {
-    return (
+}: IConfirmDialogProps) => (
         <Dialog
-            data-testid={id}
+            id={id}
             open={open}
             onClose={onClose}
             aria-labelledby="confirm-dialog"
             aria-describedby="confirm-dialog-description"
         >
             <DialogTitle>
-                <span data-testid={`${id}-title`}>{title}</span>
+                {title}
                 <IconButton
                     aria-label="close"
                     onClick={onClose}
@@ -51,25 +50,14 @@ const ConfirmDialog = <T extends {}>({
             </DialogTitle>
             <DialogContent>{children}</DialogContent>
             <DialogActions>
-                <Button
-                    data-testid={`${id}-cancel-button`}
-                    variant="contained"
-                    onClick={onClose}
-                    color="secondary"
-                >
+                <Button id="cancel-btn" variant="contained" onClick={onClose} color="secondary">
                     Cancel
                 </Button>
-                <Button
-                    data-testid={`${id}-confirm-button`}
-                    variant="contained"
-                    onClick={onConfirm}
-                    color="primary"
-                >
+                <Button id="confirm-btn" variant="contained" onClick={onConfirm} color="primary">
                     Confirm
                 </Button>
             </DialogActions>
         </Dialog>
     )
-}
 
 export default ConfirmDialog

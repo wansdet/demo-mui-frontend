@@ -55,8 +55,6 @@ export interface IBlogPost {
     blogPostImages?: IBlogPostImage[]
 }
 
-export interface IBlogPostUpdate extends IBlogPost {}
-
 export interface IBlogPostTransition {
     remarks: string
 }

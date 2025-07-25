@@ -18,7 +18,7 @@ interface IBlogPostCommentListProps {
 
 const BlogPostCommentList = ({ comments }: IBlogPostCommentListProps) => {
     const publishedComments = comments.filter(
-        (comment) => comment.status == 'published'
+        (comment) => comment.status === 'published'
     )
 
     return (
@@ -32,12 +32,10 @@ const BlogPostCommentList = ({ comments }: IBlogPostCommentListProps) => {
                     <ListItem alignItems="flex-start">
                         <ListItemText
                             primary={
-                                <React.Fragment>
-                                    <H4>{comment.createdBy}</H4>
-                                </React.Fragment>
+                                <H4>{comment.createdBy}</H4>
                             }
                             secondary={
-                                <React.Fragment>
+                                <>
                                     <Typography variant={'subtitle1'}>
                                         {dateFormat(
                                             comment.createdAt,
@@ -49,7 +47,7 @@ const BlogPostCommentList = ({ comments }: IBlogPostCommentListProps) => {
                                         readOnly
                                     />
                                     <Paragraph>{comment.comment}</Paragraph>
-                                </React.Fragment>
+                                </>
                             }
                         />
                     </ListItem>

@@ -18,7 +18,7 @@ const Carousel = (props: ICarouselProps) => {
     const { images, showThumbnails = false } = props
 
     return (
-        <React.Fragment>
+        <>
             <CssBaseline />
             {/* The Box component has width: '100vw' set, which makes it span
             the full width of the viewport. The overflowX property of the Box
@@ -35,9 +35,9 @@ const Carousel = (props: ICarouselProps) => {
                 }}
             >
                 <ImageGallery
-                    autoPlay={true}
+                    autoPlay
                     items={images}
-                    lazyLoad={true}
+                    lazyLoad
                     showFullscreenButton={false}
                     showNav={false}
                     showPlayButton={false}
@@ -45,7 +45,7 @@ const Carousel = (props: ICarouselProps) => {
                     slideInterval={10000}
                 />
             </Box>
-        </React.Fragment>
+        </>
     )
 }
 

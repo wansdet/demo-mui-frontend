@@ -4,6 +4,7 @@ import '@testing-library/jest-dom/extend-expect'
 import ButtonSubmit from './ButtonSubmit'
 import { Overwrite } from '@mui/types'
 import { ButtonProps } from '@mui/material/Button'
+import { vi } from 'vitest'
 
 type ButtonSubmitProps = Overwrite<
     ButtonProps,
@@ -24,7 +25,8 @@ describe('ButtonSubmit Component', () => {
         const { getByText } = renderButtonSubmit({ onClick })
 
         const buttonElement = getByText('Submit')
-        expect(buttonElement).toBeInTheDocument()
+        expect(buttonElement).to.not.be.null
+        expect(buttonElement?.textContent).to.equal('Submit')
     })
 
     it('calls the onClick handler when the button is clicked', () => {
@@ -35,7 +37,8 @@ describe('ButtonSubmit Component', () => {
         buttonElement.click()
 
         // Check if the onClick handler is called
-        expect(onClick).toHaveBeenCalledTimes(1)
+        expect(onClick).to.have.been.calledOnce
+
     })
 
     it('applies the correct styles to the button', () => {
@@ -44,9 +47,9 @@ describe('ButtonSubmit Component', () => {
         const buttonElement = getByText('Submit')
 
         // Check if the button has the "contained" variant
-        expect(buttonElement).toHaveClass('MuiButton-contained')
+        expect(buttonElement?.classList.contains('MuiButton-contained'))
 
         // Check if the button has the "primary" color
-        expect(buttonElement).toHaveClass('MuiButton-containedPrimary')
+        expect(buttonElement?.classList.contains('MuiButton-containedPrimary'))
     })
 })

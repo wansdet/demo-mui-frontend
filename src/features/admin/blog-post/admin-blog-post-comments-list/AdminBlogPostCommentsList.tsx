@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { Container, IconButton, Tooltip, Typography } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import VisibilityIcon from '@mui/icons-material/Visibility'
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridPaginationModel } from '@mui/x-data-grid'
 
 import {
     ApplicationContext,
@@ -20,7 +20,6 @@ import { ConfirmDialog } from '@/components/utils'
 
 const AdminBlogPostCommentsList = () => {
     const [blogPostComments, setBlogPostComments] = useState<any[]>([])
-    const [pageSize, setPageSize] = useState(10)
     const [selectedBlogPostComment, setSelectedBlogPostComment] = useState<
         any | null
     >(null)
@@ -32,11 +31,16 @@ const AdminBlogPostCommentsList = () => {
         data: fetchedBlogPostComments,
         loading: getLoading,
         error: getError,
-    } = useApiGet<any[]>(API_URL_BLOG_POST_COMMENTS)
+    } = useApiGet<IBlogPostComment[]>(API_URL_BLOG_POST_COMMENTS)
 
     const { showLoading, hideLoading } = useContext(ApplicationContext)
     const { showNotification, NotificationComponent } = useNotification()
     const navigate = useNavigate()
+
+    const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+        pageSize: 100,
+        page: 0,
+    })
 
     useEffect(() => {
         if (fetchedBlogPostComments) {
@@ -63,9 +67,6 @@ const AdminBlogPostCommentsList = () => {
             ? `${API_URL_BLOG_POST_COMMENTS}/${selectedBlogPostComment.blogPostCommentId}`
             : ''
     )
-    useEffect(() => {
-        setPageSize(10)
-    }, [])
 
     useEffect(() => {
         if (getLoading) {
@@ -73,7 +74,7 @@ const AdminBlogPostCommentsList = () => {
         } else {
             hideLoading()
         }
-    }, [getLoading])
+    }, [getLoading, hideLoading, showLoading])
 
     const handleShowBlogPostComment = (params: any, event: any) => {
         navigate(`/admin/blog-posts/blog-post-comment-show/${params.id}`)
@@ -120,31 +121,27 @@ const AdminBlogPostCommentsList = () => {
         }
     }
 
-    const renderBlogPostCommentStatus = (props: any) => {
-        return (
-            <React.Fragment>
-                {props.value ? (
-                    <ChipStatus
-                        id="status"
-                        statusValue={props.value}
-                        statuses={blogPostCommentStatuses}
-                        size="small"
-                    />
-                ) : (
-                    ''
-                )}
-            </React.Fragment>
+    const renderBlogPostCommentStatus = (props: any) => (
+            props.value ? (
+                <ChipStatus
+                    id="status"
+                    statusValue={props.value}
+                    statuses={blogPostCommentStatuses}
+                    size="small"
+                />
+            ) : (
+                ''
+            )
         )
-    }
 
     const renderBlogPostCommentActions = (props: any) => {
         return (
-            <React.Fragment>
+            <>
                 <Tooltip
                     title={`View blog post comment ${props.row.blogPostCommentId}`}
                 >
                     <IconButton
-                        data-test="blog-post-comment-show-button"
+                        data-test="blog-post-comment-show-btn"
                         onClick={(event) =>
                             handleShowBlogPostComment(props, event)
                         }
@@ -152,23 +149,11 @@ const AdminBlogPostCommentsList = () => {
                         <VisibilityIcon aria-label="show" color="success" />
                     </IconButton>
                 </Tooltip>
-                {/*<Tooltip
-                    title={`Edit blog post comment ${props.row.blogPostCommentId}`}
-                >
-                    <IconButton
-                        data-test="blog-post-comment-edit-button"
-                        onClick={(event) =>
-                            handleEditBlogPostComment(props, event)
-                        }
-                    >
-                        <EditIcon aria-label="edit" color="primary" />
-                    </IconButton>
-                </Tooltip>*/}
                 <Tooltip
                     title={`Manage blog post comment ${props.row.blogPostCommentId}`}
                 >
                     <IconButton
-                        data-test="blog-post-comment-manage-button"
+                        data-test="blog-post-comment-manage-btn"
                         onClick={(event) =>
                             handleManageBlogPostComment(props, event)
                         }
@@ -181,7 +166,7 @@ const AdminBlogPostCommentsList = () => {
                         title={`Delete blog post comment ${props.row.blogPostCommentId}`}
                     >
                         <IconButton
-                            data-test="blog-post-comment-delete-button"
+                            data-test="blog-post-comment-delete-btn"
                             onClick={(event) =>
                                 handleDeleteBlogPostComment(props, event)
                             }
@@ -190,7 +175,7 @@ const AdminBlogPostCommentsList = () => {
                         </IconButton>
                     </Tooltip>
                 )}
-            </React.Fragment>
+            </>
         )
     }
 
@@ -214,34 +199,35 @@ const AdminBlogPostCommentsList = () => {
     ]
 
     return (
-        <React.Fragment>
+        <>
             <Container
                 data-testid="admin-blog-post-comments-list-content"
                 maxWidth="lg"
                 component="main"
                 sx={{ pt: 0, pb: 8 }}
             >
-                <H1 variant="h3" data-testid="page-heading">
+                <H1 variant="h3" className="page-heading" data-testid="manage-blog-post-comments-heading">
                     {title}
                 </H1>
                 <div data-test="data-grid" style={{ width: '100%' }}>
                     <DataGrid
-                        autoHeight={true}
+                        data-testid="manage-blog-post-comments-data-table"
+                        autoHeight
                         rows={blogPostComments}
                         columns={blogPostCommentsDataGridColumns}
                         pagination
                         getRowId={(row) => row.blogPostCommentId}
-                        rowsPerPageOptions={[5, 10, 20, 50, 100]}
-                        pageSize={pageSize}
-                        onPageSizeChange={(newPageSize) =>
-                            setPageSize(newPageSize)
-                        }
+                        pageSizeOptions={[5, 10, 20, 50, 100]}
+                        paginationModel={paginationModel}
+                        onPaginationModelChange={(model: GridPaginationModel) => {
+                            setPaginationModel(model)
+                        }}
                         sx={{ mt: 6, backgroundColor: 'background.paper' }}
                     />
                 </div>
                 <ConfirmDialog
                     id="delete-confirm-dialog"
-                    title="Delete Blog Post sComment"
+                    title="Delete Blog Post Comment"
                     open={confirmDialogOpen}
                     onConfirm={onDeleteBlogPostComment}
                     onClose={() => setConfirmDialogOpen(false)}
@@ -281,7 +267,7 @@ const AdminBlogPostCommentsList = () => {
                 <NotificationComponent />
             </Container>
             <AdminFooter />
-        </React.Fragment>
+        </>
     )
 }
 

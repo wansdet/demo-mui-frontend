@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
 import { Button, Rating, TextField } from '@mui/material'
 
-// @ts-ignore
-const BlogPostCommentCreate = ({ onCommentSubmit }) => {
+type BlogPostCommentCreateProps = {
+    onCommentSubmit: (data: { comment: string; rating: number | null }) => void
+}
+
+const BlogPostCommentCreate: React.FC<BlogPostCommentCreateProps> = ({ onCommentSubmit }) => {
     const [comment, setComment] = useState<string>('')
     const [rating, setRating] = useState<number | null>(null)
 
@@ -19,7 +22,7 @@ const BlogPostCommentCreate = ({ onCommentSubmit }) => {
     const handleSubmit = (event: { preventDefault: () => void }) => {
         event.preventDefault()
         const formData = {
-            comment: comment,
+            comment,
             rating: rating ? rating * 2 : null,
         }
         onCommentSubmit(formData)
@@ -33,7 +36,7 @@ const BlogPostCommentCreate = ({ onCommentSubmit }) => {
                 placeholder="Write your comment here..."
                 value={comment}
                 onChange={handleCommentChange}
-                fullWidth={true}
+                fullWidth
                 required
                 sx={{ my: 3 }}
             />

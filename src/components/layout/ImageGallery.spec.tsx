@@ -16,7 +16,7 @@ describe('ImageGallery Component', () => {
         const imageElements = screen.getAllByAltText(/Image \d/)
 
         // Check if the number of rendered images matches the number of mock images
-        expect(imageElements.length).toBe(mockImages.length)
+        expect(imageElements.length).to.be.equal(mockImages.length)
     })
 
     it('renders images with correct source and alt attributes', () => {
@@ -28,8 +28,8 @@ describe('ImageGallery Component', () => {
         // Check if each image has the correct src and alt attributes
         imageElements.forEach((imageElement, index) => {
             const { url, title } = mockImages[index]
-            expect(imageElement).toHaveAttribute('src', url)
-            expect(imageElement).toHaveAttribute('alt', title)
+            expect(imageElement?.getAttribute('src')).to.be.equal(url)
+            expect(imageElement?.getAttribute('alt')).to.be.equal(title)
         })
     })
 })

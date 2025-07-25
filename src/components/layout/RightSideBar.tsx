@@ -1,6 +1,5 @@
 import React, { ReactNode } from 'react'
 import Box, { BoxProps } from '@mui/material/Box'
-import Hidden from '@mui/material/Hidden'
 
 interface RightSideBarProps extends BoxProps {
     children: ReactNode

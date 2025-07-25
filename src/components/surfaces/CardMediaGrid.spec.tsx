@@ -1,6 +1,6 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { BrowserRouter as Router } from 'react-router-dom'
+import { BrowserRouter as Router } from 'react-router'
 import CardMediaGrid from './CardMediaGrid'
 
 const mockMedia = [
@@ -31,34 +31,31 @@ describe('CardMediaGrid Component', () => {
                     buttonText={buttonText}
                     infoPrefix={infoPrefix}
                 />
-            </Router>
+            </Router>,
         )
 
         // Check if all media titles are rendered
         mockMedia.forEach((mediaItem) => {
             const mediaTitle = screen.getByText(mediaItem.title)
-            expect(mediaTitle).toBeInTheDocument()
+            expect(mediaTitle).to.not.be.null
+            expect(mediaTitle?.textContent).to.equal(mediaItem.title)
         })
 
         // Check if all media descriptions are rendered
         mockMedia.forEach((mediaItem) => {
             const mediaDescription = screen.getByText(mediaItem.description)
-            expect(mediaDescription).toBeInTheDocument()
+            expect(mediaDescription).to.not.be.null
+            expect(mediaDescription?.textContent).to.equal(mediaItem.description)
         })
 
         // Check if all buttons are rendered with the correct text and accessibility attributes
         const buttons = screen.getAllByRole('button')
-        expect(buttons).toHaveLength(mockMedia.length)
+        expect(buttons).to.have.length(mockMedia.length)
+
         buttons.forEach((button, index) => {
-            expect(button).toHaveTextContent(buttonText)
-            expect(button).toHaveAttribute(
-                'title',
-                `${infoPrefix} ${mockMedia[index].title}`
-            )
-            expect(button).toHaveAttribute(
-                'aria-label',
-                `${infoPrefix} ${mockMedia[index].title}`
-            )
+            expect(button?.textContent).to.equal(buttonText)
+            expect(button?.getAttribute('title')).to.equal(`${infoPrefix} ${mockMedia[index].title}`)
+            expect(button?.getAttribute('aria-label')).to.equal(`${infoPrefix} ${mockMedia[index].title}`)
         })
     })
 })

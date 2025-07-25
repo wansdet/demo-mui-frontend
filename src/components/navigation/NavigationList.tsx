@@ -1,11 +1,10 @@
 import React from 'react'
 import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
-import { Link } from 'react-router-dom'
-import { useTheme } from '@mui/material/styles'
+import { Link } from 'react-router'
+import { useTheme, Palette } from '@mui/material/styles'
 import { SxProps } from '@mui/system'
 import { merge } from 'lodash'
-import { Palette } from '@mui/material/styles'
 
 interface INavLink {
     url: string
@@ -37,7 +36,7 @@ const NavigationList = (props: INavigationListProps) => {
             mt: 3,
             backgroundColor: 'grey.200',
         },
-        sx
+        sx,
     )
 
     return (
@@ -45,8 +44,8 @@ const NavigationList = (props: INavigationListProps) => {
             <Typography component="h2" variant="h5" gutterBottom>
                 {listTitle}
             </Typography>
-            {navLinks.map((link, index) => (
-                <Typography key={index} gutterBottom>
+            {navLinks.map((link) => (
+                <Typography key={link.url} gutterBottom>
                     <Link
                         to={link.url}
                         style={{ textDecoration: 'none', color: linkColor }}

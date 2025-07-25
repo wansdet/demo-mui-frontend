@@ -14,7 +14,7 @@ import {
     ApplicationContext,
 } from '@/core/application'
 import { useApiGet } from '@/core/api'
-import { Footer } from '@/core/layout'
+import Footer from '@/core/layout/Footer'
 import { IInformation } from '@/common/models/information'
 import { Heading, Paragraph, Section } from '@/components/data-display'
 
@@ -57,8 +57,6 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 const Faq = () => {
     const [faqs, setFaqs] = useState<IInformation[]>([])
     const [expanded, setExpanded] = React.useState<string | false>('panel1')
-    const [loading, setLoading] = useState<boolean>(false)
-    const [error, setError] = useState<string | null>(null)
     const title = 'Frequently Asked Questions'
     document.title = `${title} | ${APP_NAME}`
 
@@ -82,7 +80,7 @@ const Faq = () => {
         } else {
             hideLoading()
         }
-    }, [getLoading])
+    }, [getLoading, hideLoading, showLoading])
 
     const handleChange =
         (panel: string) =>
@@ -91,19 +89,19 @@ const Faq = () => {
         }
 
     return (
-        <React.Fragment>
-            <Container maxWidth="lg" component="main" sx={{ pt: 0, pb: 8 }}>
+        <>
+            <Container id="faq-container" maxWidth="lg" component="main" sx={{ pt: 0, pb: 8 }}>
                 <Section id="faq-section">
-                    <Heading>{title}</Heading>
+                    <Heading className="page-heading" data-testid="faq-heading">{title}</Heading>
                     <Paragraph data-testid="faq-introduction" sx={{ mb: 5 }}>
                         Explore our FAQ page for swift answers to common
-                        queries. Whether you're new or returning, find solutions
+                        queries. Whether you&#39;re new or returning, find solutions
                         to your questions across various categories. Need
                         further assistance? Contact our dedicated support team
                         for help.
                     </Paragraph>
                     {faqs && (
-                        <React.Fragment>
+                        <>
                             {faqs.map((faq: IInformation) => (
                                 <Accordion
                                     data-test="faq-accordian"
@@ -125,12 +123,12 @@ const Faq = () => {
                                     </AccordionDetails>
                                 </Accordion>
                             ))}
-                        </React.Fragment>
+                        </>
                     )}
                 </Section>
             </Container>
             <Footer />
-        </React.Fragment>
+        </>
     )
 }
 

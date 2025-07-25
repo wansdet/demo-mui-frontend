@@ -10,7 +10,7 @@ const useNotification = () => {
 
     const showNotification = (
         message: any,
-        status: AlertColor | undefined = 'info'
+        status: AlertColor | undefined = 'info',
     ) => {
         setShowSnackbar(true)
         setSnackbarMessage(message)
@@ -25,13 +25,11 @@ const useNotification = () => {
 
     const NotificationComponent = () => (
         <Snackbar
-            data-testid="use-notification"
             open={showSnackbar}
             autoHideDuration={3000}
             onClose={hideNotification}
         >
             <MuiAlert
-                data-testid="notification-message"
                 elevation={6}
                 variant="filled"
                 onClose={hideNotification}

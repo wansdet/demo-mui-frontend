@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router'
 import { Box, Button, Container, FormLabel, Grid, Input } from '@mui/material'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 
@@ -41,12 +41,12 @@ const AdminBlogPostCommentShow = () => {
         } else {
             hideLoading()
         }
-    }, [getLoading])
+    }, [getLoading, hideLoading, showLoading])
 
     return (
-        <React.Fragment>
+        <>
             {blogPostComment && (
-                <React.Fragment>
+                <>
                     <Container
                         data-testid="admin-blog-post-comment-show-content"
                         maxWidth="md"
@@ -57,7 +57,7 @@ const AdminBlogPostCommentShow = () => {
                             {title}
                         </H1>
                         <Button
-                            data-testid="return-button"
+                            data-testid="return-btn"
                             color="primary"
                             startIcon={<ChevronLeftIcon />}
                             sx={{ mb: 3 }}
@@ -67,7 +67,7 @@ const AdminBlogPostCommentShow = () => {
                         </Button>
                         <Box sx={{ backgroundColor: 'background.paper', p: 8 }}>
                             <Grid container spacing={3}>
-                                <Grid item xs={12} sm={4}>
+                                <Grid size={{ xs: 12, sm: 4 }}>
                                     <FormLabel
                                         htmlFor="id"
                                         data-testid="id-label"
@@ -75,7 +75,7 @@ const AdminBlogPostCommentShow = () => {
                                         ID
                                     </FormLabel>
                                 </Grid>
-                                <Grid item xs={12} sm={8}>
+                                <Grid size={{ xs: 12, sm: 8 }}>
                                     <Input
                                         id="id"
                                         data-testid="id"
@@ -83,13 +83,13 @@ const AdminBlogPostCommentShow = () => {
                                         value={
                                             blogPostComment.blogPostCommentId
                                         }
-                                        fullWidth={true}
+                                        fullWidth
                                         inputProps={{
                                             readOnly: true,
                                         }}
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={4}>
+                                <Grid size={{ xs: 12, sm: 4 }}>
                                     <FormLabel
                                         htmlFor="comment"
                                         data-testid="comment-label"
@@ -97,20 +97,20 @@ const AdminBlogPostCommentShow = () => {
                                         Comment
                                     </FormLabel>
                                 </Grid>
-                                <Grid item xs={12} sm={8}>
+                                <Grid size={{ xs: 12, sm: 8 }}>
                                     <Input
                                         id="comment"
                                         data-testid="comment"
                                         name="comment"
                                         value={blogPostComment.comment}
-                                        multiline={true}
-                                        fullWidth={true}
+                                        multiline
+                                        fullWidth
                                         inputProps={{
                                             readOnly: true,
                                         }}
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={4}>
+                                <Grid size={{ xs: 12, sm: 4 }}>
                                     <FormLabel
                                         htmlFor="rating"
                                         data-testid="rating-label"
@@ -118,19 +118,19 @@ const AdminBlogPostCommentShow = () => {
                                         Rating
                                     </FormLabel>
                                 </Grid>
-                                <Grid item xs={12} sm={8}>
+                                <Grid size={{ xs: 12, sm: 8 }}>
                                     <Input
                                         id="rating"
                                         data-testid="rating"
                                         name="rating"
                                         value={blogPostComment.rating}
-                                        fullWidth={true}
+                                        fullWidth
                                         inputProps={{
                                             readOnly: true,
                                         }}
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={4}>
+                                <Grid size={{ xs: 12, sm: 4 }}>
                                     <FormLabel
                                         htmlFor="status"
                                         data-testid="status-label"
@@ -138,14 +138,14 @@ const AdminBlogPostCommentShow = () => {
                                         Status
                                     </FormLabel>
                                 </Grid>
-                                <Grid item xs={12} sm={8}>
+                                <Grid size={{ xs: 12, sm: 8 }}>
                                     <ChipStatus
                                         id="status"
                                         statusValue={blogPostComment.status}
                                         statuses={blogPostCommentStatuses}
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={4}>
+                                <Grid size={{ xs: 12, sm: 4 }}>
                                     <FormLabel
                                         htmlFor="createdBy"
                                         data-testid="created-by-label"
@@ -153,19 +153,19 @@ const AdminBlogPostCommentShow = () => {
                                         Created By
                                     </FormLabel>
                                 </Grid>
-                                <Grid item xs={12} sm={8}>
+                                <Grid size={{ xs: 12, sm: 8 }}>
                                     <Input
                                         id="createdBy"
                                         data-testid="created-by"
                                         name="createdBy"
                                         value={blogPostComment.createdBy}
-                                        fullWidth={true}
+                                        fullWidth
                                         inputProps={{
                                             readOnly: true,
                                         }}
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={4}>
+                                <Grid size={{ xs: 12, sm: 4 }}>
                                     <FormLabel
                                         htmlFor="createdAt"
                                         data-testid="created-at-label"
@@ -173,19 +173,19 @@ const AdminBlogPostCommentShow = () => {
                                         Created
                                     </FormLabel>
                                 </Grid>
-                                <Grid item xs={12} sm={8}>
+                                <Grid size={{ xs: 12, sm: 8 }}>
                                     <Input
                                         id="createdAt"
                                         data-testid="created-at"
                                         name="createdAt"
                                         value={blogPostComment.createdAt}
-                                        fullWidth={true}
+                                        fullWidth
                                         inputProps={{
                                             readOnly: true,
                                         }}
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={4}>
+                                <Grid size={{ xs: 12, sm: 4 }}>
                                     <FormLabel
                                         htmlFor="updatedBy"
                                         data-testid="updated-by-label"
@@ -193,19 +193,19 @@ const AdminBlogPostCommentShow = () => {
                                         Updated By
                                     </FormLabel>
                                 </Grid>
-                                <Grid item xs={12} sm={8}>
+                                <Grid size={{ xs: 12, sm: 8 }}>
                                     <Input
                                         id="updatedBy"
                                         data-testid="updated-by"
                                         name="updatedBy"
                                         value={blogPostComment.updatedBy}
-                                        fullWidth={true}
+                                        fullWidth
                                         inputProps={{
                                             readOnly: true,
                                         }}
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={4}>
+                                <Grid size={{ xs: 12, sm: 4 }}>
                                     <FormLabel
                                         htmlFor="updatedAt"
                                         data-testid="updated-at-label"
@@ -213,13 +213,13 @@ const AdminBlogPostCommentShow = () => {
                                         Last updated
                                     </FormLabel>
                                 </Grid>
-                                <Grid item xs={12} sm={8}>
+                                <Grid size={{ xs: 12, sm: 8 }}>
                                     <Input
                                         id="updatedAt"
                                         data-testid="updated-at"
                                         name="updatedAt"
                                         value={blogPostComment.updatedAt}
-                                        fullWidth={true}
+                                        fullWidth
                                         inputProps={{
                                             readOnly: true,
                                         }}
@@ -229,9 +229,9 @@ const AdminBlogPostCommentShow = () => {
                         </Box>
                     </Container>
                     <AdminFooter />
-                </React.Fragment>
+                </>
             )}
-        </React.Fragment>
+        </>
     )
 }
 

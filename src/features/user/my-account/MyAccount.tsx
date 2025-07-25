@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, Container, Tabs, Tab, Typography } from '@mui/material'
 
-import { Footer } from '@/core/layout'
+import Footer from '@/core/layout/Footer'
 import { H1 } from '@/components/data-display'
 import { PasswordChange, PersonalDetails } from '@/features/user/my-account'
 
@@ -11,7 +11,7 @@ interface ITabPanelProps {
     value: number
 }
 
-function CustomTabPanel(props: ITabPanelProps) {
+const CustomTabPanel = (props: ITabPanelProps) => {
     const { children, value, index, ...other } = props
 
     return (
@@ -46,9 +46,9 @@ const MyAccount = () => {
     }
 
     return (
-        <React.Fragment>
+        <>
             <Container maxWidth="md" component="main" sx={{ pt: 0, pb: 8 }}>
-                <H1 variant="h3">My Account</H1>
+                <H1 id="my-account-heading" variant="h3">My Account</H1>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs
                         value={value}
@@ -67,7 +67,7 @@ const MyAccount = () => {
                 </CustomTabPanel>
             </Container>
             <Footer />
-        </React.Fragment>
+        </>
     )
 }
 

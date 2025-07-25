@@ -1,12 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { Container, IconButton, Tooltip, Typography } from '@mui/material'
-import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import VisibilityIcon from '@mui/icons-material/Visibility'
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridPaginationModel } from '@mui/x-data-grid'
 
-import { ApplicationContext, API_URL_USERS } from '@/core/application'
+import { ApplicationContext, API_URL_USERS, APP_NAME } from '@/core/application'
 import { useApiGet, useApiDelete } from '@/core/api'
 import { AdminFooter } from '@/core/layout'
 import useNotification from '@/common/hooks/feedback/useNotification'
@@ -16,7 +15,6 @@ import { ConfirmDialog } from '@/components/utils'
 
 const AdminUsersList = () => {
     const [users, setUsers] = useState<any[]>([])
-    const [pageSize, setPageSize] = useState(10)
     const [selectedUser, setSelectedUser] = useState<IUser | null>(null)
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
     const {
@@ -29,8 +27,17 @@ const AdminUsersList = () => {
     const { showNotification, NotificationComponent } = useNotification()
     const navigate = useNavigate()
 
+    const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+        pageSize: 100,
+        page: 0,
+    })
+
+    const title = 'Manage Users'
+    document.title = `${title} | Admin | ${APP_NAME}`
+
     useEffect(() => {
         if (fetchedUsers) {
+            // console.log('fetchedUsers:', fetchedUsers);
             setUsers(
                 fetchedUsers.map((user: IUser) => ({
                     userId: user.userId,
@@ -53,16 +60,12 @@ const AdminUsersList = () => {
     )
 
     useEffect(() => {
-        setPageSize(10)
-    }, [])
-
-    useEffect(() => {
         if (getLoading) {
             showLoading()
         } else {
             hideLoading()
         }
-    }, [getLoading])
+    }, [getLoading, hideLoading, showLoading])
 
     const handleShowUser = (params: any, event: any) => {
         navigate(`/admin/users/user-show/${params.id}`)
@@ -106,29 +109,27 @@ const AdminUsersList = () => {
 
     const renderUserStatus = (props: any) => {
         return (
-            <React.Fragment>
-                {props.value ? (
-                    <ChipStatus
-                        id="status"
-                        statusValue={props.value}
-                        statuses={userStatuses}
-                        size="small"
-                    />
-                ) : (
-                    ''
-                )}
-            </React.Fragment>
+            props.value ? (
+                <ChipStatus
+                    id="status"
+                    statusValue={props.value}
+                    statuses={userStatuses}
+                    size="small"
+                />
+            ) : (
+                ''
+            )
         )
     }
 
     const renderUserActions = (props: any) => {
         return (
-            <React.Fragment>
+            <>
                 <Tooltip
-                    title={`View user ${props.row.firstName} ${props.row.lastName}`}
+                    title={`Show user ${props.row.firstName} ${props.row.lastName}`}
                 >
                     <IconButton
-                        data-testid="user-show-button"
+                        data-test="user-show-btn"
                         onClick={(event) => handleShowUser(props, event)}
                     >
                         <VisibilityIcon aria-label="show" color="success" />
@@ -138,23 +139,13 @@ const AdminUsersList = () => {
                     title={`Edit user ${props.row.firstName} ${props.row.lastName}`}
                 >
                     <IconButton
-                        data-testid="user-edit-button"
+                        data-test="user-manage-btn"
                         onClick={(event) => handleEditUser(props, event)}
                     >
-                        <EditIcon aria-label="edit" color="primary" />
+                        <EditIcon aria-label="manage" color="primary" />
                     </IconButton>
                 </Tooltip>
-                {/*<Tooltip
-                    title={`Delete user ${props.row.firstName} ${props.row.lastName}`}
-                >
-                    <IconButton
-                        data-testid="user-delete-button"
-                        onClick={(event) => handleDeleteUser(props, event)}
-                    >
-                        <DeleteIcon aria-label="delete" color="error" />
-                    </IconButton>
-                </Tooltip>*/}
-            </React.Fragment>
+            </>
         )
     }
 
@@ -180,28 +171,29 @@ const AdminUsersList = () => {
     ]
 
     return (
-        <React.Fragment>
+        <>
             <Container
                 data-testid="admin-users-list-content"
                 maxWidth="lg"
                 component="main"
                 sx={{ pt: 8, pb: 8 }}
             >
-                <H1 variant="h3" data-testid="page-heading">
-                    Manage Users
+                <H1 variant="h3" className="page-heading" data-testid="page-heading">
+                    {title}
                 </H1>
                 <div data-test="data-grid" style={{ width: '100%' }}>
                     <DataGrid
-                        autoHeight={true}
+                        data-testid="manage-users-data-table"
+                        autoHeight
                         rows={users}
                         columns={usersDataGridColumns}
                         pagination
                         getRowId={(row) => row.userId}
-                        rowsPerPageOptions={[5, 10, 20, 50, 100]}
-                        pageSize={pageSize}
-                        onPageSizeChange={(newPageSize) =>
-                            setPageSize(newPageSize)
-                        }
+                        pageSizeOptions={[5, 10, 20, 50, 100]}
+                        paginationModel={paginationModel}
+                        onPaginationModelChange={(model: GridPaginationModel) => {
+                            setPaginationModel(model)
+                        }}
                         sx={{ mt: 6, backgroundColor: 'background.paper' }}
                     />
                 </div>
@@ -244,7 +236,7 @@ const AdminUsersList = () => {
                 <NotificationComponent />
             </Container>
             <AdminFooter />
-        </React.Fragment>
+        </>
     )
 }
 

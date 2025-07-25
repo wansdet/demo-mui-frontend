@@ -1,16 +1,16 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { Button, Container, Typography } from '@mui/material'
 
 import { APP_NAME } from '@/core/application'
 import { SecurityContext } from '@/core/security'
-import { Footer } from '@/core/layout'
+import Footer from '@/core/layout/Footer'
 import { H1 } from '@/components/data-display'
 
 const SignOut = () => {
     const auth = React.useContext(SecurityContext)
     const navigate = useNavigate()
-    const title: string = 'Sign out'
+    const title = 'Sign out'
     document.title = `${title} | ${APP_NAME}`
 
     const handleSignOut = () => {
@@ -18,22 +18,23 @@ const SignOut = () => {
     }
 
     return (
-        <React.Fragment>
+        <>
             <Container
+                id="sign-out-container"
                 maxWidth="md"
                 component="main"
                 sx={{ mt: 0, pt: 0, pb: 8 }}
             >
-                <H1>Sign out</H1>
-                <Typography variant="body1" mb={5} gutterBottom>
+                <H1 className="page-heading">Sign out</H1>
+                <Typography data-testid="sign-out-text" variant="body1" mb={5} gutterBottom>
                     Are sure you want to sign out?
                 </Typography>
-                <Button variant="contained" onClick={handleSignOut}>
+                <Button data-testid="sign-out-confirm-btn" variant="contained" onClick={handleSignOut}>
                     Confirm Sign out
                 </Button>
             </Container>
             <Footer />
-        </React.Fragment>
+        </>
     )
 }
 

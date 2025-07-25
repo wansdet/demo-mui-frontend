@@ -1,34 +1,39 @@
 import React from 'react'
 import Input, { InputProps } from '@mui/material/Input'
 import FormHelperText from '@mui/material/FormHelperText'
-import { Controller } from 'react-hook-form'
+import {
+    Controller,
+    Control,
+    FieldErrors,
+    FieldValues,
+    Path, PathValue
+} from 'react-hook-form'
 
-interface IFormInputProps
+interface IFormInputProps<T extends FieldValues>
     extends Omit<InputProps, 'name' | 'control' | 'defaultValue'> {
-    name: string
-    control: any
+    name: Path<T>
+    control: Control<T>
     type: string
     color?: 'primary' | 'secondary'
-    errors: any
-    defaultValue?: string | number | null
+    errors: FieldErrors<T>
+    defaultValue?: PathValue<T, Path<T>> | undefined
 }
 
-const FormInput = ({
-    name,
-    control,
-    type = 'text',
-    color = 'secondary',
-    errors,
-    defaultValue = '',
-    ...props
-}: IFormInputProps) => {
-    return (
+const FormInput = <T extends FieldValues>({
+                          name,
+                          control,
+                          type = 'text',
+                          color = 'secondary',
+                          errors,
+                          defaultValue,
+                          ...props
+                      }: IFormInputProps<T>) => (
         <Controller
             name={name}
             control={control}
             defaultValue={defaultValue}
             render={({ field }) => (
-                <React.Fragment>
+                <>
                     <Input
                         {...field}
                         value={field.value}
@@ -40,12 +45,11 @@ const FormInput = ({
                         {...props}
                     />
                     <FormHelperText id={`${name}-helper-text`}>
-                        {errors[name]?.message}
+                        {errors[name]?.message as string}
                     </FormHelperText>
-                </React.Fragment>
+                </>
             )}
         />
     )
-}
 
 export default FormInput

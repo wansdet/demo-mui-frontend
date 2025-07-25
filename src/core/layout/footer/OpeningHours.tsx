@@ -1,19 +1,16 @@
 import React from 'react'
 import {
-    Paper,
     Table,
     TableBody,
     TableCell,
-    TableContainer,
     TableHead,
     TableRow,
 } from '@mui/material'
 
 import { H3 } from '@/components/data-display'
 
-const OpeningHours = () => {
-    return (
-        <React.Fragment>
+const OpeningHours = () => (
+        <>
             <H3 data-testid="opening-hours-heading">Opening Hours</H3>
             <Table size="small" aria-label="opening hours">
                 <TableHead>
@@ -69,8 +66,7 @@ const OpeningHours = () => {
                     </TableRow>
                 </TableBody>
             </Table>
-        </React.Fragment>
+        </>
     )
-}
 
 export default OpeningHours

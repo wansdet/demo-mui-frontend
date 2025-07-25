@@ -17,8 +17,58 @@
         "sourceType": "module",
         "project": "./tsconfig.json"
     },
-    "plugins": ["@typescript-eslint", "react"],
+    "plugins": ["@typescript-eslint", "react", "chai-friendly"],
     "rules": {
-        "react/react-in-jsx-scope": 0
+        "react/react-in-jsx-scope": 0,
+        "import/prefer-default-export": "off",
+        "import/extensions": [
+            "error",
+            "ignorePackages",
+            {
+                "ts": "never",
+                "tsx": "never",
+                "js": "always",
+                "jsx": "always"
+            }
+        ],
+        "react/function-component-definition": [
+            "error",
+            {
+                "namedComponents": "arrow-function",
+                "unnamedComponents": "arrow-function"
+            }
+        ],
+        "react/jsx-props-no-spreading": [
+            "error",
+            {
+                "custom": "ignore",
+                "explicitSpread": "ignore",
+                "exceptions": []
+            }
+        ],
+        "react/require-default-props": "off",
+        "@typescript-eslint/no-unused-expressions": "off",
+        "no-unused-expressions": "off",
+        "chai-friendly/no-unused-expressions": "error"
+    },
+    "overrides": [
+        {
+            "files": ["*.test.ts", "*.test.tsx"],
+            "rules": {
+                "import/no-extraneous-dependencies": ["error", { "devDependencies": true }]
+            }
+        }
+    ],
+    "settings": {
+        "import/resolver": {
+            "typescript": {},
+            "node": {
+                "extensions": [".js", ".jsx", ".ts", ".tsx"]
+            },
+            "alias": {
+                "map": [["@", "./src"]],
+                "extensions": [".js", ".jsx", ".ts", ".tsx"]
+            }
+        }
     }
 }

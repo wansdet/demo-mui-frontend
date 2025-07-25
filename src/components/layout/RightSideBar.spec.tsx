@@ -7,6 +7,7 @@ describe('RightSideBar Component', () => {
         const testText = 'Right Side Bar Test'
         const { getByText } = render(<RightSideBar>{testText}</RightSideBar>)
         const renderedText = getByText(testText)
-        expect(renderedText).toBeInTheDocument()
+        expect(renderedText).to.not.be.null
+        expect(renderedText?.textContent).to.equal(testText)
     })
 })

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router'
 import Axios from 'axios'
 import { Button, Container, CssBaseline, Grid, Typography } from '@mui/material'
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
@@ -16,9 +16,9 @@ import {
     BASE_IMAGE_ASSETS_URL,
 } from '@/core/application'
 import { useApiGet } from '@/core/api'
-import { Footer } from '@/core/layout'
+import Footer from '@/core/layout/Footer'
 import { IImage } from '@/common'
-import { IBlogPostComment, IBlogPostUpdate } from '@/common/models/blog'
+import { IBlogPostComment, IBlogPost } from '@/common/models/blog'
 import {
     H2,
     H3,
@@ -41,7 +41,7 @@ import {
 
 const BlogPostShow = () => {
     const { id } = useParams()
-    const [blogPost, setBlogPost] = useState<IBlogPostUpdate | null>(null)
+    const [blogPost, setBlogPost] = useState<IBlogPost | null>(null)
     const [galleryImages, setGalleryImages] = useState<IImage[]>([])
     const [loading, setLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
@@ -51,7 +51,7 @@ const BlogPostShow = () => {
         data: fetchedBlogPost,
         loading: getLoading,
         error: getError,
-    } = useApiGet<IBlogPostUpdate>(`${API_URL_BLOG_POSTS}/${id}`, false)
+    } = useApiGet<IBlogPost>(`${API_URL_BLOG_POSTS}/${id}`, false)
 
     const title = 'Blog Post'
     document.title = `${title} | ${APP_NAME}`
@@ -93,7 +93,7 @@ const BlogPostShow = () => {
                     ...(blogPost?.blogPostComments || []),
                     response.data,
                 ]
-                const updatedBlogPost: IBlogPostUpdate = {
+                const updatedBlogPost: IBlogPost = {
                     ...blogPost,
                     blogPostComments: updatedComments,
                     blogPostId: blogPost?.blogPostId || '',
@@ -102,140 +102,135 @@ const BlogPostShow = () => {
                 }
                 setBlogPost(updatedBlogPost)
             })
-            .catch((error) => {
-                if ([422].includes(error.response.status)) {
-                    showNotification(
-                        error.response.data['hydra:description'],
-                        'error'
-                    )
+            .catch((e) => {
+                if ([422].includes(e.response.status)) {
+                    showNotification(e.response.data.description, 'error')
                 } else {
                     showNotification(
                         'Error occurred while submitting blog post',
-                        'error'
+                        'error',
                     )
                 }
             })
     }
 
     return (
-        <React.Fragment>
+        <>
             <CssBaseline />
             {blogPost && (
-                <React.Fragment>
-                    <Container maxWidth="lg" sx={{ mb: 20 }}>
-                        <Button
-                            color="primary"
-                            startIcon={<ChevronLeftIcon />}
-                            sx={{ mb: 5 }}
-                            onClick={() => navigate(-1)}
-                        >
-                            Return
-                        </Button>
-                        <Grid container spacing={5} sx={{ pt: 0 }}>
-                            <Grid item xs={12} md={8} sx={{ py: 3 }}>
-                                <main>
-                                    <article>
-                                        <Section id="blog-post-main-content">
-                                            <header data-testid="blog-post-title">
-                                                <Heading>
-                                                    {blogPost.title}
-                                                </Heading>
-                                            </header>
-                                            <Typography
-                                                variant="subtitle1"
-                                                style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                }}
-                                                sx={{ mb: 1 }}
-                                            >
-                                                <CalendarTodayIcon
-                                                    fontSize="small"
-                                                    color="primary"
-                                                    sx={{ mr: 1 }}
-                                                />
-                                                {dateFormat(
-                                                    blogPost.createdAt,
-                                                    'MMM D, YYYY'
-                                                )}
-                                                <ArticleIcon
-                                                    fontSize="small"
-                                                    color="primary"
-                                                    sx={{ ml: 1, mr: 1 }}
-                                                />
-                                                {blogPost.createdBy}
-                                                <TopicIcon
-                                                    fontSize="small"
-                                                    color="primary"
-                                                    sx={{ ml: 1, mr: 1 }}
-                                                />
-                                                {
-                                                    blogPost.blogCategory
-                                                        .blogCategoryName
-                                                }{' '}
-                                                <CommentIcon
-                                                    fontSize="small"
-                                                    color="primary"
-                                                    sx={{ ml: 1, mr: 1 }}
-                                                />
-                                                {blogPost.blogPostComments
-                                                    ?.length || 0}
-                                            </Typography>
-                                            <img
-                                                src={`${BASE_IMAGE_ASSETS_URL}/600x300?text=Blog Post Image`}
-                                                alt={blogPost.title}
-                                                width="100%"
-                                                loading="lazy"
-                                                style={{
-                                                    height: 'auto',
-                                                }}
-                                            />{' '}
-                                            <ParagraphSanitized
-                                                data-testid="blog-post-show-lead-description"
-                                                text={blogPost.content!}
+                <Container maxWidth="lg" sx={{ mb: 20 }}>
+                    <Button
+                        color="primary"
+                        startIcon={<ChevronLeftIcon />}
+                        sx={{ mb: 5 }}
+                        onClick={() => navigate(-1)}
+                    >
+                        Return
+                    </Button>
+                    <Grid container spacing={5} sx={{ pt: 0 }}>
+                        <Grid size={{ xs: 12, md: 8 }} sx={{ py: 3 }}>
+                            <main>
+                                <article>
+                                    <Section id="blog-post-main-content">
+                                        <header data-testid="blog-post-title">
+                                            <Heading className="page-heading">
+                                                {blogPost.title}
+                                            </Heading>
+                                        </header>
+                                        <Typography
+                                            variant="subtitle1"
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                            }}
+                                            sx={{ mb: 1 }}
+                                        >
+                                            <CalendarTodayIcon
+                                                fontSize="small"
+                                                color="primary"
+                                                sx={{ mr: 1 }}
                                             />
-                                            <BlogPostSocialMedia />
-                                            <H2 sx={{ mt: 10 }}>Comments</H2>
-                                            <BlogPostCommentList
-                                                comments={
-                                                    blogPost.blogPostComments!
+                                            {dateFormat(
+                                                blogPost.createdAt,
+                                                'MMM D, YYYY',
+                                            )}
+                                            <ArticleIcon
+                                                fontSize="small"
+                                                color="primary"
+                                                sx={{ ml: 1, mr: 1 }}
+                                            />
+                                            {blogPost.createdBy}
+                                            <TopicIcon
+                                                fontSize="small"
+                                                color="primary"
+                                                sx={{ ml: 1, mr: 1 }}
+                                            />
+                                            {
+                                                blogPost.blogCategory
+                                                    .blogCategoryName
+                                            }{' '}
+                                            <CommentIcon
+                                                fontSize="small"
+                                                color="primary"
+                                                sx={{ ml: 1, mr: 1 }}
+                                            />
+                                            {blogPost.blogPostComments
+                                                ?.length || 0}
+                                        </Typography>
+                                        <img
+                                            src={`${BASE_IMAGE_ASSETS_URL}/600x300?text=Blog Post Image`}
+                                            alt={blogPost.title}
+                                            width="100%"
+                                            loading="lazy"
+                                            style={{
+                                                height: 'auto',
+                                            }}
+                                        />{' '}
+                                        <ParagraphSanitized
+                                            data-testid="blog-post-show-lead-description"
+                                            text={blogPost.content!}
+                                        />
+                                        <BlogPostSocialMedia />
+                                        <H2 sx={{ mt: 10 }}>Comments</H2>
+                                        <BlogPostCommentList
+                                            comments={
+                                                blogPost.blogPostComments!
+                                            }
+                                        />
+                                        <H2>Leave a comment</H2>
+                                        {/* if authenticated display add comment form otherwise display message */}
+                                        {auth.user ? (
+                                            <BlogPostCommentCreate
+                                                onCommentSubmit={
+                                                    handleCommentSubmit
                                                 }
                                             />
-                                            <H2>Leave a comment</H2>
-                                            {/* if authenticated display add comment form otherwise display message */}
-                                            {auth.user ? (
-                                                <BlogPostCommentCreate
-                                                    onCommentSubmit={
-                                                        handleCommentSubmit
-                                                    }
-                                                />
-                                            ) : (
-                                                <Paragraph>
-                                                    You must sign in to leave a
-                                                    comment.
-                                                </Paragraph>
-                                            )}
-                                        </Section>
-                                    </article>
-                                </main>
-                            </Grid>
-                            <SideBar>
-                                <aside>
-                                    <BlogAuthor author={blogPost.author!} />
-                                    <BlogCategories />
-                                    <H3>GALLERY</H3>
-                                    {galleryImages.length > 0 && (
-                                        <ImageGallery images={galleryImages} />
-                                    )}
-                                </aside>
-                            </SideBar>
+                                        ) : (
+                                            <Paragraph>
+                                                You must sign in to leave a
+                                                comment.
+                                            </Paragraph>
+                                        )}
+                                    </Section>
+                                </article>
+                            </main>
                         </Grid>
-                        <NotificationComponent />
-                    </Container>
-                </React.Fragment>
+                        <SideBar id="blog-post-sidebar">
+                            <aside>
+                                <BlogAuthor author={blogPost.author!} />
+                                <BlogCategories />
+                                <H3>GALLERY</H3>
+                                {galleryImages.length > 0 && (
+                                    <ImageGallery images={galleryImages} />
+                                )}
+                            </aside>
+                        </SideBar>
+                    </Grid>
+                    <NotificationComponent />
+                </Container>
             )}
             <Footer />
-        </React.Fragment>
+        </>
     )
 }
 

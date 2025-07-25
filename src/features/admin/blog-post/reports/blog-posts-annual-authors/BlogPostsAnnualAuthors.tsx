@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Box, Container } from '@mui/material'
-// import { PieChart } from '@mui/x-charts'
+import { PieChart } from '@mui/x-charts'
 
 import { useApiGet } from '@/core/api'
 import { AdminFooter } from '@/core/layout'
@@ -11,7 +11,7 @@ import {
 } from '@/core/application'
 import { IAnnualBlogPostAuthors, IBlogPostAuthor } from '@/common/models/blog'
 import { IPieChartSeriesData } from '@/common/models/chart'
-import { H1, Paragraph } from '@/components/data-display'
+import { H1 } from '@/components/data-display'
 import { YearSelection } from '@/components/utils'
 
 const BlogPostsAnnualAuthors = () => {
@@ -23,7 +23,7 @@ const BlogPostsAnnualAuthors = () => {
         new Date().getFullYear()
     )
     const [series, setSeries] = useState<IPieChartSeriesData[]>([])
-    const title = 'Annual Blog Posts by Authors Report'
+    const title = 'Annual Blog Posts by Authors'
 
     document.title = `${title} | Admin | ${APP_NAME}`
 
@@ -45,9 +45,7 @@ const BlogPostsAnnualAuthors = () => {
                     (annualBlogPost: IAnnualBlogPostAuthors) =>
                         annualBlogPost.year
                 )
-                .filter((value: number, index: number, self: number[]) => {
-                    return self.indexOf(value) === index
-                })
+                .filter((value: number, index: number, self: number[]) => self.indexOf(value) === index)
 
             setYears(uniqueYears)
         }
@@ -59,7 +57,7 @@ const BlogPostsAnnualAuthors = () => {
         } else {
             hideLoading()
         }
-    }, [getLoading])
+    }, [getLoading, hideLoading, showLoading])
 
     useEffect(() => {
         const selectedYearData = annualBlogPosts.find(
@@ -90,25 +88,21 @@ const BlogPostsAnnualAuthors = () => {
     }
 
     return (
-        <React.Fragment>
+        <>
             <Container
-                data-testid="blog-posts-annual-authors-content"
+                data-testid="annual-blog-posts-authors-content"
                 maxWidth="lg"
                 sx={{ pt: 8, pb: 8 }}
             >
-                <H1 variant="h3" data-testid="page-heading">
+                <H1 variant="h3" className="page-heading" data-testid="annual-blog-posts-authors-heading">
                     {title}
                 </H1>
-                <Paragraph>
-                    TODO: Replace MUI x-charts with another library to avoid
-                    Popper issue.
-                </Paragraph>
                 <YearSelection
                     years={years}
                     selectedYear={selectedYear}
                     onChange={handleYearChange}
                 />
-                {/*{series.length > 0 && (
+                {series.length > 0 && (
                     <Box
                         data-testid="blog-posts-annual-authors-chart"
                         sx={{
@@ -127,10 +121,10 @@ const BlogPostsAnnualAuthors = () => {
                             sx={{ width: '100%', height: '100%' }}
                         />
                     </Box>
-                )}*/}
+                )}
             </Container>
             <AdminFooter />
-        </React.Fragment>
+        </>
     )
 }
 

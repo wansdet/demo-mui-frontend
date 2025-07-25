@@ -2,12 +2,13 @@ import React from 'react'
 import Grid from '@mui/material/Grid'
 
 interface ISideBarProps {
+    id?: string
     children: React.ReactNode
 }
 
-const SideBar = ({ children }: ISideBarProps) => {
+const SideBar = ({ id, children }: ISideBarProps) => {
     return (
-        <Grid data-test="side-bar" item xs={12} md={4}>
+        <Grid id={id} size={{ xs: 12, md: 4 }}>
             {children}
         </Grid>
     )

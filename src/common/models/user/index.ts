@@ -8,7 +8,7 @@ export type {
     IUserPublic,
     IUserUpdate,
 } from './user.interface'
-export { genderOptions, userRoles, userStatuses } from './user.constants'
+export { genderOptions, titleOptions, userRoles, userStatuses } from './user.constants'
 export {
     userAccountUpdateSchema,
     userCredentialsSchema,

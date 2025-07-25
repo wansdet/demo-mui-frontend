@@ -4,40 +4,35 @@ import { Chip, ChipProps } from '@mui/material'
 import { IStatus } from '@/common'
 
 interface IChipStatusProps {
-    id: string
+    id?: string
     statusValue: string
     statuses: IStatus[]
     size?: ChipProps['size']
-    variant?: any
+    variant?: 'filled' | 'outlined'
 }
 
+const getStatusByValue = (statuses: IStatus[], value: string): IStatus | undefined =>
+    statuses.find((item: IStatus) => item.value === value)
+
 const ChipStatus: React.FC<IChipStatusProps> = ({
-    id = 'status',
+    id,
     statusValue,
     statuses,
     size = 'medium',
-    variant = 'contained',
+    variant = 'filled',
 }) => {
-    const status = statuses.find(
-        (status: IStatus) => status.value === statusValue
-    )
+    const currentStatus = getStatusByValue(statuses, statusValue)
 
-    return (
-        <>
-            {status ? (
-                <Chip
-                    data-testid={id}
-                    key={status.value}
-                    label={status.label}
-                    color={status.color as ChipProps['color']}
-                    size={size}
-                    variant={variant}
-                />
-            ) : (
-                ''
-            )}
-        </>
-    )
+    return currentStatus ? (
+        <Chip
+            id={id}
+            key={currentStatus.value}
+            label={currentStatus.label}
+            color={currentStatus.color as ChipProps['color']}
+            size={size}
+            variant={variant}
+        />
+    ) : null; // Explicitly return
 }
 
 export default ChipStatus

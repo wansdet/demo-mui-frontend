@@ -22,20 +22,25 @@ const useApiPatch = <T>(url: string): PatchAPIResponse<T> => {
 
     const headers = {
         ...authHeader(),
-        'Content-Type': 'application/vnd.api+json',
+        'Content-Type': 'application/merge-patch+json',
     }
 
-    const patchData = async (patchData: Partial<T>): Promise<void> => {
+    const patchData = async (payload: Partial<T>): Promise<void> => {
         try {
             setLoading(true)
-            const response = await axios.patch(url, patchData, { headers })
+            const response = await axios.patch(url, payload, { headers })
             setData(response.data)
             setLoading(false)
             setError(null)
-        } catch (error: any) {
-            setError(error)
-            setLoading(false)
-            throw error
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                setError(err)
+                throw err
+            } else {
+                const unexpectedError = new Error('An unexpected error occurred')
+                setError(unexpectedError as AxiosError)
+                throw unexpectedError
+            }
         }
     }
 

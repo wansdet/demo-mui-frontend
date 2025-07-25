@@ -3,9 +3,8 @@ import { Button, TextField, Typography } from '@mui/material'
 
 import { H3 } from '@/components/data-display'
 
-const Newsletter = () => {
-    return (
-        <React.Fragment>
+const Newsletter = () => (
+        <>
             <H3 data-testid="newsletter-heading">Newsletter</H3>
             <Typography
                 data-testid="newsletter-description"
@@ -20,13 +19,13 @@ const Newsletter = () => {
                 id="email-address"
                 data-testid="email-address"
                 label="Email address"
-                size={'small'}
+                size='small'
                 variant="outlined"
                 fullWidth
             />
             <Button
                 id="subscribe"
-                data-testid="subscribe-button"
+                data-testid="subscribe-btn"
                 variant="contained"
                 sx={{
                     backgroundColor: 'purple',
@@ -36,8 +35,7 @@ const Newsletter = () => {
             >
                 Subscribe
             </Button>
-        </React.Fragment>
+        </>
     )
-}
 
 export default Newsletter

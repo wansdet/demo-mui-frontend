@@ -17,16 +17,18 @@ describe('Carousel Component', () => {
     it('renders the image carousel correctly', () => {
         const { container } = render(<Carousel images={mockImages} />)
         const imageGallery = container.querySelector('.image-gallery')
-        expect(imageGallery).toBeInTheDocument()
+        expect(imageGallery).to.not.be.null
+        expect(imageGallery?.classList.contains('image-gallery')).to.be.true
     })
 
     it('renders the image carousel with thumbnails correctly', () => {
         const { container } = render(
-            <Carousel images={mockImages} showThumbnails />
+            <Carousel images={mockImages} showThumbnails />,
         )
         const imageGallery = container.querySelector(
-            '.image-gallery-thumbnails'
+            '.image-gallery-thumbnails',
         )
-        expect(imageGallery).toBeInTheDocument()
+        expect(imageGallery).to.not.be.null
+        expect(imageGallery?.classList.contains('image-gallery-thumbnails')).to.be.true
     })
 })

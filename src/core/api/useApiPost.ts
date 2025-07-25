@@ -16,7 +16,7 @@ interface PostAPIResponse<T> extends ApiResponse<T> {
 
 const useApiPost = <T>(
     url: string,
-    hasAuthHeader: boolean = true
+    hasAuthHeader = true
 ): PostAPIResponse<T> => {
     const [data, setData] = useState<T | null>(null)
     const [error, setError] = useState<AxiosError | null>(null)
@@ -25,20 +25,22 @@ const useApiPost = <T>(
     const { authHeader } = useContext(SecurityContext)
     const headers = hasAuthHeader ? authHeader() : {}
 
-    const postData = async (postData: T): Promise<void> => {
+    const postData = async (payload: T): Promise<void> => {
         try {
             setLoading(true)
-            const response = await axios.post(url, postData, { headers })
+            const response = await axios.post(url, payload, { headers })
             setData(response.data)
             setError(null)
             setLoading(false)
-        } catch (error: any) {
-            setError(error)
-            // Extract the error message and error code from the error object
-            // const { message, code } = error.response.data
-            // console.log(`Error data: ${code}: ${message}`)
-            setLoading(false)
-            throw error
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                setError(err)
+                throw err
+            } else {
+                const unexpectedError = new Error('An unexpected error occurred')
+                setError(unexpectedError as AxiosError)
+                throw unexpectedError
+            }
         }
     }
 

@@ -7,7 +7,7 @@ describe('Paragraph Component', () => {
         const { container } = render(<Paragraph>Paragraph</Paragraph>)
 
         const paragraphElement = container.querySelector('p')
-        expect(paragraphElement).toBeInTheDocument()
-        expect(paragraphElement?.textContent).toBe('Paragraph')
+        expect(paragraphElement).to.not.be.null
+        expect(paragraphElement?.textContent).to.equal('Paragraph')
     })
 })

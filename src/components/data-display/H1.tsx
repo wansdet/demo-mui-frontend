@@ -1,17 +1,19 @@
 import React from 'react'
 import Typography, { TypographyProps } from '@mui/material/Typography'
-import { Overwrite } from '@mui/types'
 
-type H1Props = Overwrite<TypographyProps, { ref?: any; component?: any }>
+type H1Props = TypographyProps & {
+    className?: string
+}
 
 const H1 = ({
+    className,
     children,
     ...props
 }: {
     children: React.ReactNode
-} & H1Props) => {
-    return (
+} & H1Props) => (
         <Typography
+            className={className}
             data-test="h1"
             component="h1"
             variant="h2"
@@ -21,6 +23,5 @@ const H1 = ({
             {children}
         </Typography>
     )
-}
 
 export default H1

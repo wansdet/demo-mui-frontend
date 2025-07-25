@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import {
     Button,
     Container,
@@ -11,7 +11,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import PublishIcon from '@mui/icons-material/Publish'
 import VisibilityIcon from '@mui/icons-material/Visibility'
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridPaginationModel } from '@mui/x-data-grid'
 
 import {
     ApplicationContext,
@@ -34,6 +34,11 @@ const BloggerBlogPostsList = () => {
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
     const title = 'My Blog Posts'
     document.title = `${title} | Admin | ${APP_NAME}`
+
+    const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+        pageSize: 100,
+        page: 0,
+    })
 
     const {
         data: fetchedBlogPosts,
@@ -75,9 +80,6 @@ const BloggerBlogPostsList = () => {
             ? `${API_URL_BLOG_POSTS}/${selectedBlogPost.blogPostId}`
             : ''
     )
-    useEffect(() => {
-        setPageSize(10)
-    }, [])
 
     useEffect(() => {
         if (getLoading) {
@@ -85,7 +87,7 @@ const BloggerBlogPostsList = () => {
         } else {
             hideLoading()
         }
-    }, [getLoading])
+    }, [getLoading, hideLoading, showLoading])
 
     useEffect(() => {
         if (postExportLoading) {
@@ -93,7 +95,7 @@ const BloggerBlogPostsList = () => {
         } else {
             hideLoading()
         }
-    }, [postExportLoading])
+    }, [hideLoading, postExportLoading, showLoading])
 
     const handleShowBlogPost = (params: any, event: any) => {
         navigate(`/admin/blog-posts/blog-post-show/${params.id}`)
@@ -159,27 +161,25 @@ const BloggerBlogPostsList = () => {
 
     const renderBlogPostStatus = (props: any) => {
         return (
-            <React.Fragment>
-                {props.value ? (
-                    <ChipStatus
-                        id="status"
-                        statusValue={props.value}
-                        statuses={blogPostStatuses}
-                        size="small"
-                    />
-                ) : (
-                    ''
-                )}
-            </React.Fragment>
+            props.value ? (
+                <ChipStatus
+                    id="status"
+                    statusValue={props.value}
+                    statuses={blogPostStatuses}
+                    size="small"
+                />
+            ) : (
+                ''
+            )
         )
     }
 
     const renderBlogPostActions = (props: any) => {
         return (
-            <React.Fragment>
+            <>
                 <Tooltip title={`View blog post ${props.row.blogPostId}`}>
                     <IconButton
-                        data-test="blog-post-show-button"
+                        data-test="blog-post-show-btn"
                         onClick={(event) => handleShowBlogPost(props, event)}
                     >
                         <VisibilityIcon aria-label="show" color="success" />
@@ -187,12 +187,12 @@ const BloggerBlogPostsList = () => {
                 </Tooltip>
                 {(props.row.status === 'draft' ||
                     props.row.status === 'rejected') && (
-                    <React.Fragment>
+                    <>
                         <Tooltip
                             title={`Edit blog post ${props.row.blogPostId}`}
                         >
                             <IconButton
-                                data-test="blog-post-edit-button"
+                                data-test="blog-post-edit-btn"
                                 onClick={(event) =>
                                     handleEditBlogPost(props, event)
                                 }
@@ -204,7 +204,7 @@ const BloggerBlogPostsList = () => {
                             title={`Delete blog post ${props.row.blogPostId}`}
                         >
                             <IconButton
-                                data-test="blog-post-delete-button"
+                                data-test="blog-post-delete-btn"
                                 onClick={(event) =>
                                     handleDeleteBlogPost(props, event)
                                 }
@@ -212,9 +212,9 @@ const BloggerBlogPostsList = () => {
                                 <DeleteIcon aria-label="delete" color="error" />
                             </IconButton>
                         </Tooltip>
-                    </React.Fragment>
+                    </>
                 )}
-            </React.Fragment>
+            </>
         )
     }
 
@@ -238,19 +238,19 @@ const BloggerBlogPostsList = () => {
     ]
 
     return (
-        <React.Fragment>
+        <>
             <Container
-                data-testid="admin-blog-posts-list-content"
+                data-testid="my-blog-posts-list-content"
                 maxWidth="lg"
                 component="main"
                 sx={{ pt: 0, pb: 8 }}
             >
-                <H1 variant="h3" data-testid="page-heading">
+                <H1 variant="h3" className="page-heading" data-testid="my-blog-posts-heading">
                     {title}
                 </H1>
                 <div>
                     <Button
-                        data-testid="blog-post-add-button"
+                        id="new-blog-post-btn"
                         variant="contained"
                         onClick={() =>
                             navigate('/admin/blog-posts/blog-post-create')
@@ -260,7 +260,7 @@ const BloggerBlogPostsList = () => {
                         New Blog Post
                     </Button>
                     <Button
-                        data-testid="blog-posts-export-button"
+                        id="my-blog-posts-export-btn"
                         variant="contained"
                         onClick={() => handleBlogPostsExport()}
                     >
@@ -270,16 +270,17 @@ const BloggerBlogPostsList = () => {
                 </div>
                 <div data-test="data-grid" style={{ width: '100%' }}>
                     <DataGrid
-                        autoHeight={true}
+                        data-testid="my-blog-posts-data-table"
+                        autoHeight
                         rows={blogPosts}
                         columns={blogPostsDataGridColumns}
                         pagination
                         getRowId={(row) => row.blogPostId}
-                        rowsPerPageOptions={[5, 10, 20, 50, 100]}
-                        pageSize={pageSize}
-                        onPageSizeChange={(newPageSize) =>
-                            setPageSize(newPageSize)
-                        }
+                        pageSizeOptions={[5, 10, 20, 50, 100]}
+                        paginationModel={paginationModel}
+                        onPaginationModelChange={(model: GridPaginationModel) => {
+                            setPaginationModel(model)
+                        }}
                         sx={{ mt: 6, backgroundColor: 'background.paper' }}
                     />
                 </div>
@@ -293,14 +294,14 @@ const BloggerBlogPostsList = () => {
                     {selectedBlogPost && (
                         <div>
                             <Typography
-                                data-testid="delete-confirm-message"
+                                data-test="delete-confirm-message"
                                 variant="body1"
                                 gutterBottom
                             >
                                 Are you sure you want to delete this blog post?
                             </Typography>
                             <Typography
-                                data-testid="delete-confirm-id"
+                                data-test="delete-confirm-id"
                                 variant="body1"
                                 gutterBottom
                             >
@@ -309,7 +310,7 @@ const BloggerBlogPostsList = () => {
                                 </strong>
                             </Typography>
                             <Typography
-                                data-testid="delete-confirm-created-by"
+                                data-test="delete-confirm-created-by"
                                 variant="body1"
                                 gutterBottom
                             >
@@ -321,7 +322,7 @@ const BloggerBlogPostsList = () => {
                 <NotificationComponent />
             </Container>
             <AdminFooter />
-        </React.Fragment>
+        </>
     )
 }
 

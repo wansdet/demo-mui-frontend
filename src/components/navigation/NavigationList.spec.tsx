@@ -1,6 +1,6 @@
 import React from 'react'
 import { render } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter } from 'react-router'
 import NavigationList from './NavigationList'
 
 describe('NavigationList Component', () => {
@@ -15,16 +15,17 @@ describe('NavigationList Component', () => {
         const { getByText, getByRole } = render(
             <BrowserRouter>
                 <NavigationList listTitle={listTitle} navLinks={navLinks} />
-            </BrowserRouter>
+            </BrowserRouter>,
         )
 
         const titleElement = getByText(listTitle)
-        expect(titleElement).toBeInTheDocument()
+        expect(titleElement).to.not.be.null
+        expect(titleElement?.textContent).to.equal(listTitle)
 
         navLinks.forEach((link) => {
             const linkElement = getByRole('link', { name: link.title })
-            expect(linkElement).toBeInTheDocument()
-            expect(linkElement.getAttribute('href')).toBe(link.url)
+            expect(linkElement).to.not.be.null
+            expect(linkElement.getAttribute('href')).to.be.equal(link.url)
         })
     })
 })

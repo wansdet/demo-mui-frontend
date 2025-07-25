@@ -9,7 +9,6 @@ export type {
     IBlogPostCommentUpdate,
     IBlogPostStatusUpdate,
     IBlogPostTransition,
-    IBlogPostUpdate,
     IMonthlyBlogPostAuthor,
     IMonthlyBlogPostCategory,
 } from './blog.interface'

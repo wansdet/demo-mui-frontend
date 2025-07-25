@@ -12,29 +12,22 @@ describe('ChipStatus Component', () => {
     it('renders chip with correct label', () => {
         const statusValue = 'status1'
         const { getByText } = render(
-            <ChipStatus
-                id="status"
-                statusValue={statusValue}
-                statuses={mockStatuses}
-            />
+            <ChipStatus id='status' size='small' statusValue={statusValue} statuses={mockStatuses} />,
         )
 
         const chipElement = getByText('Status 1')
-        expect(chipElement).toBeInTheDocument()
+        expect(chipElement).to.not.be.null
+        expect(chipElement?.textContent).to.equal('Status 1')
     })
 
     it('does not render chip when statusValue does not match any status', () => {
         const statusValue = 'nonExistentStatus'
         const { container } = render(
-            <ChipStatus
-                id="status"
-                statusValue={statusValue}
-                statuses={mockStatuses}
-            />
+            <ChipStatus id='status' size='small' statusValue={statusValue} statuses={mockStatuses} />,
         )
 
         const chipElement = container.querySelector('.MuiChip-root')
-        expect(chipElement).not.toBeInTheDocument()
+        expect(chipElement).to.be.null
     })
 
     // Test size prop
@@ -42,14 +35,15 @@ describe('ChipStatus Component', () => {
         const statusValue = 'status1'
         const { container } = render(
             <ChipStatus
-                id="status"
+                id='status'
+                size='small'
                 statusValue={statusValue}
                 statuses={mockStatuses}
-                size="small"
-            />
+            />,
         )
 
         const chipElement = container.querySelector('.MuiChip-sizeSmall')
-        expect(chipElement).toBeInTheDocument()
+        expect(chipElement).to.not.be.null
+        expect(chipElement?.classList.contains('MuiChip-sizeSmall')).to.be.true
     })
 })

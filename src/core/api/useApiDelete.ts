@@ -26,10 +26,15 @@ const useApiDelete = (url: string): DeleteAPIResponse => {
             await axios.delete(url, { headers })
             setError(null)
             setLoading(false)
-        } catch (error: any) {
-            setError(error)
-            setLoading(false)
-            throw error
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                setError(err)
+                throw err
+            } else {
+                const unexpectedError = new Error('An unexpected error occurred')
+                setError(unexpectedError as AxiosError)
+                throw unexpectedError
+            }
         }
     }
 

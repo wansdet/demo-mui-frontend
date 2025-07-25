@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import {
     Alert,
     Checkbox,
@@ -10,10 +10,15 @@ import {
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 
-import { API_URL_USERS, PATH_WELCOME } from '@/core/application'
+import { API_URL_USERS, APP_NAME, PATH_WELCOME } from '@/core/application'
 import { useApiPost } from '@/core/api'
 import useNotification from '@/common/hooks/feedback/useNotification'
-import { genderOptions, IUser, userSignUpSchema } from '@/common/models/user'
+import {
+    genderOptions,
+    IUser,
+    titleOptions,
+    userSignUpSchema,
+} from '@/common/models/user'
 import { ButtonSubmit, FormInputText, FormSelect } from '@/components/inputs'
 import { SignUpHelper, SignUpTemplate } from '@/features/user'
 
@@ -22,6 +27,9 @@ const SignUp = () => {
     const [errorMessage, setErrorMessage] = useState('')
     const { showNotification, NotificationComponent } = useNotification()
     const navigate = useNavigate()
+    const title = 'Sign up'
+
+    document.title = `${title} | ${APP_NAME}`
 
     const {
         postData: user,
@@ -39,37 +47,56 @@ const SignUp = () => {
     } = useForm(formOptions)
 
     const onSubmit = (data: any) => {
-        console.log(data)
+        // console.log(data)
         user(data)
             .then(() => {
                 navigate(PATH_WELCOME, { replace: true })
             })
             .catch((error) => {
                 if ([422].includes(error.response.status)) {
-                    setErrorMessage(error.response.data['hydra:description'])
+                    setErrorMessage(error.response.data.description)
                     setDisplayError(true)
                 } else {
                     showNotification(
                         'Error occurred while creating user account',
-                        'error'
+                        'error',
                     )
                 }
             })
     }
 
     return (
-        <React.Fragment>
-            <SignUpTemplate title="Sign up">
+        <>
+            <SignUpTemplate title={title}>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Grid container spacing={2} sx={{ pt: 3 }}>
                         {displayError && (
-                            <Grid item xs={12}>
+                            <Grid size={{ xs: 12 }}>
                                 <Alert severity="error" sx={{ mb: 2 }}>
                                     {errorMessage}
                                 </Alert>
                             </Grid>
                         )}
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12 }}>
+                            <FormSelect
+                                data-testid="sign-up-title-select"
+                                name="title"
+                                label="Title"
+                                control={control}
+                                errors={errors}
+                                sx={{ my: 0 }}
+                            >
+                                {titleOptions.map((titleOption) => (
+                                    <MenuItem
+                                        key={titleOption.value}
+                                        value={titleOption.value}
+                                    >
+                                        {titleOption.label}
+                                    </MenuItem>
+                                ))}
+                            </FormSelect>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <FormInputText
                                 name="firstName"
                                 control={control}
@@ -79,7 +106,7 @@ const SignUp = () => {
                                 sx={{ my: 0 }}
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <FormInputText
                                 name="lastName"
                                 control={control}
@@ -89,7 +116,7 @@ const SignUp = () => {
                                 sx={{ my: 0 }}
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <FormInputText
                                 name="email"
                                 control={control}
@@ -99,7 +126,17 @@ const SignUp = () => {
                                 sx={{ my: 0 }}
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
+                            <FormInputText
+                                name="displayName"
+                                control={control}
+                                label="Display name"
+                                type="text"
+                                errors={errors}
+                                sx={{ my: 0 }}
+                            />
+                        </Grid>
+                        <Grid size={{ xs: 12 }}>
                             <FormInputText
                                 name="password"
                                 control={control}
@@ -109,7 +146,7 @@ const SignUp = () => {
                                 sx={{ my: 0 }}
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <FormInputText
                                 name="confirmPassword"
                                 control={control}
@@ -119,17 +156,18 @@ const SignUp = () => {
                                 sx={{ my: 0 }}
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <FormSelect
+                                data-testid="sign-up-gender-select"
                                 name="gender"
                                 label="Gender"
                                 control={control}
                                 errors={errors}
                                 sx={{ my: 0 }}
                             >
-                                {genderOptions.map((genderOption, index) => (
+                                {genderOptions.map((genderOption) => (
                                     <MenuItem
-                                        key={index}
+                                        key={genderOption.value}
                                         value={genderOption.value}
                                     >
                                         {genderOption.label}
@@ -137,7 +175,7 @@ const SignUp = () => {
                                 ))}
                             </FormSelect>
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <FormControlLabel
                                 control={
                                     <Checkbox
@@ -149,14 +187,18 @@ const SignUp = () => {
                             />
                         </Grid>
                     </Grid>
-                    <ButtonSubmit fullWidth sx={{ mt: 3, mb: 2 }}>
+                    <ButtonSubmit
+                        data-testid="sign-up-submit-btn"
+                        fullWidth
+                        sx={{ mt: 3, mb: 2 }}
+                    >
                         Sign up
                     </ButtonSubmit>
                     <SignUpHelper />
                 </form>
             </SignUpTemplate>
             <NotificationComponent />
-        </React.Fragment>
+        </>
     )
 }
 

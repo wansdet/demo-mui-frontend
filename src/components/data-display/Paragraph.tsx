@@ -9,12 +9,10 @@ const Paragraph = ({
     ...props
 }: {
     children: React.ReactNode
-} & ParagraphProps) => {
-    return (
+} & ParagraphProps) => (
         <Typography data-test="p" paragraph {...props}>
             {children}
         </Typography>
     )
-}
 
 export default Paragraph

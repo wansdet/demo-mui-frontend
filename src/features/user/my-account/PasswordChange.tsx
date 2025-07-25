@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { Alert, Box, Button, FormLabel, Grid } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -10,7 +10,7 @@ import {
     API_URL_USER_PASSWORD_CHANGE,
     APP_NAME,
 } from '@/core/application'
-import { useApiGet, useApiPut } from '@/core/api'
+import { useApiGet, useApiPatch } from '@/core/api'
 import { SecurityContext } from '@/core/security'
 import useNotification from '@/common/hooks/feedback/useNotification'
 import {
@@ -29,10 +29,12 @@ const PasswordChange = () => {
     const { showNotification, NotificationComponent } = useNotification()
     const { data: fetchedUser } = useApiGet<IUserUpdate>(API_URL_USER_ACCOUNT)
     const {
-        putData: updatedUser,
+        patchData: updatedUser,
         loading: getLoading,
         error: getError,
-    } = useApiPut<IUserPasswordChange>(`${API_URL_USER_PASSWORD_CHANGE}/${id}`)
+    } = useApiPatch<IUserPasswordChange>(
+        `${API_URL_USER_PASSWORD_CHANGE}/${id}`,
+    )
 
     const title = 'Change password'
     document.title = `${title} | ${APP_NAME}`
@@ -63,7 +65,7 @@ const PasswordChange = () => {
         } else {
             hideLoading()
         }
-    }, [getLoading])
+    }, [getLoading, hideLoading, showLoading])
 
     const onSubmit = (data: any) => {
         const formData = {
@@ -80,11 +82,11 @@ const PasswordChange = () => {
             .catch((error) => {
                 if ([422].includes(error.response.status)) {
                     setInvalidCredentials(true)
-                    setErrorMessage(error.response.data['hydra:description'])
+                    setErrorMessage(error.response.data.description)
                 } else {
                     showNotification(
                         'Error occurred while updating user',
-                        'error'
+                        'error',
                     )
                 }
             })
@@ -95,101 +97,96 @@ const PasswordChange = () => {
     }
 
     return (
-        <React.Fragment>
-            {user && (
-                <React.Fragment>
-                    <Box sx={{ backgroundColor: 'background.paper', p: 8 }}>
-                        {invalidCredentials && (
+        user && (
+            <>
+                <Box sx={{ backgroundColor: 'background.paper', p: 8 }}>
+                    {invalidCredentials && (
+                        <Alert
+                            data-testid="password-change-error"
+                            severity="error"
+                            sx={{ mt: 0, mb: 5 }}
+                        >
+                            {errorMessage}
+                        </Alert>
+                    )}
+                    {passwordChanged ? (
+                        <>
                             <Alert
-                                data-testid="password-change-error"
-                                severity="error"
+                                data-testid="password-changed"
+                                severity="success"
                                 sx={{ mt: 0, mb: 5 }}
                             >
-                                {errorMessage}
+                                Password changed successfully. Please sign out
+                                and sign in again.
                             </Alert>
-                        )}
-                        {passwordChanged ? (
-                            <React.Fragment>
-                                <Alert
-                                    data-testid="password-changed"
-                                    severity="success"
-                                    sx={{ mt: 0, mb: 5 }}
-                                >
-                                    Password changed successfully. Please sign
-                                    out and sign in again.
-                                </Alert>
-                                <Button
-                                    variant="contained"
-                                    onClick={handleSignOut}
-                                >
-                                    Sign out
-                                </Button>
-                            </React.Fragment>
-                        ) : (
-                            <form onSubmit={handleSubmit(onSubmit)}>
-                                <Grid container spacing={3}>
-                                    <Grid item xs={12} sm={4}>
-                                        <FormLabel htmlFor="currentPassword">
-                                            Current password
-                                        </FormLabel>
-                                    </Grid>
-                                    <Grid item xs={12} sm={8}>
-                                        <FormInput
-                                            name="currentPassword"
-                                            control={control}
-                                            type="password"
-                                            errors={errors}
-                                            defaultValue=""
-                                            fullWidth={true}
-                                            sx={{ m: 0, p: 0 }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                        <FormLabel htmlFor="newPassword">
-                                            New password
-                                        </FormLabel>
-                                    </Grid>
-                                    <Grid item xs={12} sm={8}>
-                                        <FormInput
-                                            name="newPassword"
-                                            control={control}
-                                            type="password"
-                                            errors={errors}
-                                            defaultValue=""
-                                            fullWidth={true}
-                                            sx={{ m: 0, p: 0 }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                        <FormLabel htmlFor="confirmPassword">
-                                            Confirm password
-                                        </FormLabel>
-                                    </Grid>
-                                    <Grid item xs={12} sm={8}>
-                                        <FormInput
-                                            name="confirmPassword"
-                                            control={control}
-                                            type="password"
-                                            errors={errors}
-                                            defaultValue=""
-                                            fullWidth={true}
-                                            sx={{ m: 0, p: 0 }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}></Grid>
-                                    <Grid item xs={12} sm={8}>
-                                        <ButtonSubmit sx={{ mt: 3, mb: 2 }}>
-                                            Submit
-                                        </ButtonSubmit>
-                                    </Grid>
+                            <Button variant="contained" onClick={handleSignOut}>
+                                Sign out
+                            </Button>
+                        </>
+                    ) : (
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                            <Grid container spacing={3}>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <FormLabel htmlFor="currentPassword">
+                                        Current password
+                                    </FormLabel>
                                 </Grid>
-                            </form>
-                        )}
-                    </Box>
-                    <NotificationComponent />
-                </React.Fragment>
-            )}
-        </React.Fragment>
+                                <Grid size={{ xs: 12, sm: 8 }}>
+                                    <FormInput
+                                        name="currentPassword"
+                                        control={control}
+                                        type="password"
+                                        errors={errors}
+                                        defaultValue=""
+                                        fullWidth
+                                        sx={{ m: 0, p: 0 }}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <FormLabel htmlFor="newPassword">
+                                        New password
+                                    </FormLabel>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 8 }}>
+                                    <FormInput
+                                        name="newPassword"
+                                        control={control}
+                                        type="password"
+                                        errors={errors}
+                                        defaultValue=""
+                                        fullWidth
+                                        sx={{ m: 0, p: 0 }}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <FormLabel htmlFor="confirmPassword">
+                                        Confirm password
+                                    </FormLabel>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 8 }}>
+                                    <FormInput
+                                        name="confirmPassword"
+                                        control={control}
+                                        type="password"
+                                        errors={errors}
+                                        defaultValue=""
+                                        fullWidth
+                                        sx={{ m: 0, p: 0 }}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 4 }}></Grid>
+                                <Grid size={{ xs: 12, sm: 8 }}>
+                                    <ButtonSubmit sx={{ mt: 3, mb: 2 }}>
+                                        Submit
+                                    </ButtonSubmit>
+                                </Grid>
+                            </Grid>
+                        </form>
+                    )}
+                </Box>
+                <NotificationComponent />
+            </>
+        )
     )
 }
 

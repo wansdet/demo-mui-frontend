@@ -19,6 +19,8 @@ export const blogPostCreateSchema = yup.object().shape({
 })
 
 export const blogPostUpdateSchema = yup.object().shape({
+    id: yup
+        .string(),
     title: yup
         .string()
         .max(100, 'Title is required and must be less than 100 characters')
@@ -45,6 +47,8 @@ export const blogPostCommentCreateSchema = yup.object().shape({
 })
 
 export const blogPostCommentUpdateSchema = yup.object().shape({
+    id: yup
+        .string(),
     comment: yup
         .string()
         .max(255)

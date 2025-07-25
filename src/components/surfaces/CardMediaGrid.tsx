@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import {
     Button,
     Card,
@@ -19,7 +19,7 @@ interface ICardMediaGridProps {
     media: IMedia[]
     buttonText: string
     infoPrefix: string
-    mediaQueryProps?: IMediaQueryProps
+    mediaQueryProps?: IMediaQueryProps | undefined
 }
 
 const CardMediaGrid = (props: ICardMediaGridProps) => {
@@ -48,7 +48,7 @@ const CardMediaGrid = (props: ICardMediaGridProps) => {
                             display: 'flex',
                             flexDirection: 'column',
                         }}
-                        variant={'outlined'}
+                        variant='outlined'
                     >
                         <CardMedia
                             component="div"

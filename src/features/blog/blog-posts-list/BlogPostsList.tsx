@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router'
 import { Container, CssBaseline, Grid, Pagination } from '@mui/material'
 
 import {
@@ -9,10 +9,10 @@ import {
     BASE_IMAGE_ASSETS_URL,
 } from '@/core/application'
 import { useApiGet } from '@/core/api'
-import { Footer } from '@/core/layout'
+import Footer from '@/core/layout/Footer'
 import { IImage } from '@/common'
 import { IBlogPost } from '@/common/models/blog'
-import { Section, H3, H1 } from '@/components/data-display'
+import { H3, H1 } from '@/components/data-display'
 import { ImageGallery, SideBar } from '@/components/layout'
 import {
     BlogAuthorsList,
@@ -31,6 +31,16 @@ const BlogPostsList = () => {
     const endIndex = page * itemsPerPage
     const [searchParams] = useSearchParams()
     const apiURL = `${API_URL_BLOG_POSTS_PUBLISHED}?${searchParams.toString()}`
+
+    function getTitle() {
+        if (searchParams.get('blogCategory')) {
+            return `${capitalizeWord(searchParams.get('blogCategory'))}  Blog`
+        }
+        if (searchParams.get('createdBy')) {
+            return `${capitalizeWords(searchParams.get('createdBy'))}  Blog`
+        }
+        return 'Blog'
+    }
 
     const title = getTitle()
 
@@ -75,38 +85,36 @@ const BlogPostsList = () => {
         } else {
             hideLoading()
         }
-    }, [getLoading])
+    }, [getLoading, hideLoading, showLoading])
 
     const displayedBlogPosts = blogPosts.slice(startIndex, endIndex)
 
     const handlePageChange = (
         event: React.ChangeEvent<unknown>,
-        value: number
+        value: number,
     ) => {
         setPage(value)
     }
 
-    function getTitle() {
-        if (searchParams.get('blogCategory')) {
-            return `${capitalizeWord(searchParams.get('blogCategory'))}  Blog`
-        } else if (searchParams.get('createdBy')) {
-            return `${capitalizeWords(searchParams.get('createdBy'))}  Blog`
-        } else {
-            return 'Blog'
-        }
-    }
-
     return (
-        <React.Fragment>
+        <>
             <CssBaseline />
-            <Container maxWidth="lg" component="main" sx={{ pt: 0, pb: 8 }}>
-                <H1 data-testid="blog-posts-list-heading">{title}</H1>
+            <Container
+                id="blog-posts-list-container"
+                maxWidth="lg"
+                component="main"
+                sx={{ pt: 0, pb: 8 }}
+            >
+                <H1
+                    className="page-heading"
+                    data-testid="blog-posts-list-heading"
+                >
+                    {title}
+                </H1>
                 <Grid container spacing={8}>
                     <Grid
                         data-testid="blog-posts-list-main-content"
-                        item
-                        xs={12}
-                        md={8}
+                        size={{ xs: 12, md: 8 }}
                     >
                         <Pagination
                             count={totalPages}
@@ -124,7 +132,7 @@ const BlogPostsList = () => {
                             onChange={handlePageChange}
                         />
                     </Grid>
-                    <SideBar>
+                    <SideBar id="blog-posts-list-sidebar">
                         <aside>
                             <BlogCategories />
                             <BlogAuthorsList />
@@ -137,7 +145,7 @@ const BlogPostsList = () => {
                 </Grid>
             </Container>
             <Footer />
-        </React.Fragment>
+        </>
     )
 }
 

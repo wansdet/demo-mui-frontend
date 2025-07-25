@@ -14,10 +14,6 @@ export default defineConfig({
             '@': path.resolve(__dirname, 'src'),
         },
     },
-    build: {
-        outDir: 'build',
-        sourcemap: true,
-    },
     test: {
         globals: true,
         environment: 'jsdom',

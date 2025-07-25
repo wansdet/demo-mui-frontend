@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import Axios from 'axios'
 
 import {
@@ -56,7 +56,7 @@ const AdminBlogPostCreate = () => {
         } else {
             hideLoading()
         }
-    }, [loading])
+    }, [hideLoading, loading, showLoading])
 
     const onSubmit = (data: any) => {
         const formData = {
@@ -75,21 +75,18 @@ const AdminBlogPostCreate = () => {
             .catch((error) => {
                 setLoading(false)
                 if ([422].includes(error.response.status)) {
-                    showNotification(
-                        error.response.data['hydra:description'],
-                        'error'
-                    )
+                    showNotification(error.response.data.description, 'error')
                 } else {
                     showNotification(
                         'Error occurred while creating blog post',
-                        'error'
+                        'error',
                     )
                 }
             })
     }
 
     return (
-        <React.Fragment>
+        <>
             <Container
                 data-testid="admin-blog-post-create-content"
                 maxWidth="md"
@@ -100,7 +97,8 @@ const AdminBlogPostCreate = () => {
                     {title}
                 </H1>
                 <Button
-                    data-testid="return-button"
+                    id="return-btn"
+                    data-testid="return-btn"
                     color="primary"
                     startIcon={<ChevronLeftIcon />}
                     sx={{ mb: 3 }}
@@ -116,7 +114,7 @@ const AdminBlogPostCreate = () => {
                 >
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Grid container spacing={3}>
-                            <Grid item xs={12} sm={4}>
+                            <Grid size={{ xs: 12, sm: 4 }}>
                                 <FormLabel
                                     htmlFor="title"
                                     data-testid="title-label"
@@ -124,7 +122,7 @@ const AdminBlogPostCreate = () => {
                                     Title
                                 </FormLabel>
                             </Grid>
-                            <Grid item xs={12} sm={8}>
+                            <Grid size={{ xs: 12, sm: 8 }}>
                                 <FormInput
                                     data-testid="title"
                                     name="title"
@@ -132,11 +130,11 @@ const AdminBlogPostCreate = () => {
                                     type="text"
                                     errors={errors}
                                     defaultValue=""
-                                    fullWidth={true}
+                                    fullWidth
                                     sx={{ m: 0, p: 0 }}
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={4}>
+                            <Grid size={{ xs: 12, sm: 4 }}>
                                 <FormLabel
                                     htmlFor="slug"
                                     data-testid="slug-label"
@@ -144,7 +142,7 @@ const AdminBlogPostCreate = () => {
                                     Slug
                                 </FormLabel>
                             </Grid>
-                            <Grid item xs={12} sm={8}>
+                            <Grid size={{ xs: 12, sm: 8 }}>
                                 <FormInput
                                     data-testid="slug"
                                     name="slug"
@@ -152,11 +150,11 @@ const AdminBlogPostCreate = () => {
                                     type="text"
                                     errors={errors}
                                     defaultValue=""
-                                    fullWidth={true}
+                                    fullWidth
                                     sx={{ m: 0, p: 0 }}
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={4}>
+                            <Grid size={{ xs: 12, sm: 4 }}>
                                 <FormLabel
                                     htmlFor="blogCategory"
                                     data-testid="blog-category-label"
@@ -164,7 +162,7 @@ const AdminBlogPostCreate = () => {
                                     Blog Category
                                 </FormLabel>
                             </Grid>
-                            <Grid item xs={12} sm={8}>
+                            <Grid size={{ xs: 12, sm: 8 }}>
                                 <FormSelect
                                     data-testid="blog-category"
                                     name="blogCategory"
@@ -174,19 +172,17 @@ const AdminBlogPostCreate = () => {
                                     defaultValue=""
                                     sx={{ my: 0 }}
                                 >
-                                    {blogCategories.map(
-                                        (categoryOption, index) => (
-                                            <MenuItem
-                                                key={index}
-                                                value={categoryOption.value}
-                                            >
-                                                {categoryOption.label}
-                                            </MenuItem>
-                                        )
-                                    )}
+                                    {blogCategories.map((categoryOption) => (
+                                        <MenuItem
+                                            key={categoryOption.label}
+                                            value={categoryOption.value}
+                                        >
+                                            {categoryOption.label}
+                                        </MenuItem>
+                                    ))}
                                 </FormSelect>
                             </Grid>
-                            <Grid item xs={12} sm={4}>
+                            <Grid size={{ xs: 12, sm: 4 }}>
                                 <FormLabel
                                     htmlFor="content"
                                     data-testid="content-label"
@@ -194,7 +190,7 @@ const AdminBlogPostCreate = () => {
                                     Content
                                 </FormLabel>
                             </Grid>
-                            <Grid item xs={12} sm={8}>
+                            <Grid size={{ xs: 12, sm: 8 }}>
                                 <FormInput
                                     data-testid="content"
                                     name="content"
@@ -202,16 +198,17 @@ const AdminBlogPostCreate = () => {
                                     type="text"
                                     errors={errors}
                                     defaultValue=""
-                                    fullWidth={true}
-                                    multiline={true}
+                                    fullWidth
+                                    multiline
                                     rows={10}
                                     sx={{ m: 0, p: 0 }}
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={4}></Grid>
-                            <Grid item xs={12} sm={8}>
+                            <Grid size={{ xs: 12, sm: 4 }}></Grid>
+                            <Grid size={{ xs: 12, sm: 8 }}>
                                 <ButtonSubmit
-                                    data-testid="submit-button"
+                                    id="save-btn"
+                                    data-testid="save-btn"
                                     sx={{ mt: 3, mb: 2, mr: 1 }}
                                 >
                                     <SaveIcon />
@@ -224,7 +221,7 @@ const AdminBlogPostCreate = () => {
                 <NotificationComponent />
             </Container>
             <AdminFooter />
-        </React.Fragment>
+        </>
     )
 }
 

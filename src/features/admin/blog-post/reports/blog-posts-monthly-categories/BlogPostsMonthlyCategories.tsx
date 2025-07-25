@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Box, Container } from '@mui/material'
-// import { BarChart } from '@mui/x-charts'
+import { BarChart } from '@mui/x-charts'
 
 import { useApiGet } from '@/core/api'
 import { AdminFooter } from '@/core/layout'
@@ -9,10 +9,9 @@ import {
     API_URL_BLOG_POSTS_MONTHLY_CATEGORIES,
     APP_NAME,
 } from '@/core/application'
-import { IMonthlyBlogPostCategory } from '@/common/models/blog'
-import { blogCategories } from '@/common/models/blog'
+import { IMonthlyBlogPostCategory , blogCategories } from '@/common/models/blog'
 import { IBarChartSeriesData } from '@/common/models/chart'
-import { H1, Paragraph } from '@/components/data-display'
+import { H1 } from '@/components/data-display'
 import { YearSelection } from '@/components/utils'
 
 const BlogPostsMonthlyCategories = () => {
@@ -58,7 +57,7 @@ const BlogPostsMonthlyCategories = () => {
         } else {
             hideLoading()
         }
-    }, [getLoading])
+    }, [getLoading, hideLoading, showLoading])
 
     useEffect(() => {
         const selectedYearData = monthlyBlogPosts.filter(
@@ -86,8 +85,8 @@ const BlogPostsMonthlyCategories = () => {
             monthData.blogPostCategories.forEach((blogPostCategory: any) => {
                 seriesData
                     .find(
-                        (series) =>
-                            series.id === blogPostCategory.blogCategoryName
+                        (s) =>
+                            s.id === blogPostCategory.blogCategoryName
                     )
                     ?.data.push(blogPostCategory.blogPostCount)
             })
@@ -105,25 +104,21 @@ const BlogPostsMonthlyCategories = () => {
     }
 
     return (
-        <React.Fragment>
+        <>
             <Container
-                data-testid="blog-posts-monthly-categories-content"
+                data-testid="monthly-blog-posts-categories-content"
                 maxWidth="lg"
                 sx={{ pt: 8, pb: 8 }}
             >
-                <H1 variant="h3" data-testid="page-heading">
+                <H1 variant="h3" className="page-heading" data-testid="monthly-blog-posts-categories-heading">
                     Monthly Blog Posts by Categories
                 </H1>
-                <Paragraph>
-                    TODO: Replace MUI x-charts with another library to avoid
-                    Popper issue.
-                </Paragraph>
                 <YearSelection
                     years={years}
                     selectedYear={selectedYear}
                     onChange={handleYearChange}
                 />
-                {/*{xAxis.length > 0 && series.length > 0 && (
+                {xAxis.length > 0 && series.length > 0 && (
                     <Box
                         data-testid="blog-posts-monthly-categories-chart"
                         sx={{
@@ -139,10 +134,10 @@ const BlogPostsMonthlyCategories = () => {
                             sx={{ width: '100%', height: '100%' }}
                         />
                     </Box>
-                )}*/}
+                )}
             </Container>
             <AdminFooter />
-        </React.Fragment>
+        </>
     )
 }
 

@@ -2,7 +2,7 @@ import React from 'react'
 import { Container } from '@mui/material'
 
 import { APP_NAME } from '@/core/application'
-import { Footer } from '@/core/layout'
+import Footer from '@/core/layout/Footer'
 import { Heading, Section, Paragraph } from '@/components/data-display'
 
 const technologies = [
@@ -25,10 +25,10 @@ const Home = () => {
     document.title = APP_NAME
 
     return (
-        <React.Fragment>
-            <Container maxWidth="md" component="main" sx={{ pt: 0, pb: 8 }}>
+        <>
+            <Container id="home-container" maxWidth="md" component="main" sx={{ pt: 0, pb: 8 }}>
                 <Section id="home-section">
-                    <Heading data-testid="home-heading">Home</Heading>
+                    <Heading className="page-heading" data-testid="home-heading">Home</Heading>
                     <Paragraph data-testid="home-text">
                         This demo application is built using the following
                         technologies:
@@ -46,7 +46,7 @@ const Home = () => {
                 </Section>
             </Container>
             <Footer />
-        </React.Fragment>
+        </>
     )
 }
 

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router'
 import {
     Box,
     Button,
@@ -21,12 +21,12 @@ import {
     API_URL_BLOG_POSTS,
     APP_NAME,
 } from '@/core/application'
-import { useApiGet, useApiPut } from '@/core/api'
+import { useApiGet, useApiPatch } from '@/core/api'
 import { AdminFooter } from '@/core/layout'
 import useNotification from '@/common/hooks/feedback/useNotification'
 import {
     IBlogPostTransition,
-    IBlogPostUpdate,
+    IBlogPost,
     blogPostStatuses,
     blogPostUpdateSchema,
 } from '@/common/models/blog'
@@ -35,34 +35,34 @@ import { ConfirmDialog } from '@/components/utils'
 
 const AdminBlogPostManage = () => {
     const { id } = useParams()
-    const [blogPost, setBlogPost] = useState<IBlogPostUpdate | null>(null)
+    const [blogPost, setBlogPost] = useState<IBlogPost | null>(null)
     const [remarks, setRemarks] = useState<string>('')
     const [rejectDialogOpen, setRejectDialogOpen] = useState(false)
     const [publishDialogOpen, setPublishDialogOpen] = useState(false)
     const [archiveDialogOpen, setArchiveDialogOpen] = useState(false)
     const { showNotification, NotificationComponent } = useNotification()
 
-    const { data: fetchedBlogPost } = useApiGet<IBlogPostUpdate>(
-        `${API_URL_BLOG_POSTS}/${id}`
+    const { data: fetchedBlogPost } = useApiGet<IBlogPost>(
+        `${API_URL_BLOG_POSTS}/${id}`,
     )
 
     const {
-        putData: rejectBlogPost,
+        patchData: rejectBlogPost,
         loading: rejectLoading,
         error: rejectError,
-    } = useApiPut<IBlogPostTransition>(`${API_URL_BLOG_POSTS}/${id}/reject`)
+    } = useApiPatch<IBlogPostTransition>(`${API_URL_BLOG_POSTS}/${id}/reject`)
 
     const {
-        putData: publishBlogPost,
+        patchData: publishBlogPost,
         loading: publishLoading,
         error: publishError,
-    } = useApiPut<IBlogPostTransition>(`${API_URL_BLOG_POSTS}/${id}/publish`)
+    } = useApiPatch<IBlogPostTransition>(`${API_URL_BLOG_POSTS}/${id}/publish`)
 
     const {
-        putData: archiveBlogPost,
+        patchData: archiveBlogPost,
         loading: archiveLoading,
         error: archiveError,
-    } = useApiPut<IBlogPostTransition>(`${API_URL_BLOG_POSTS}/${id}/archive`)
+    } = useApiPatch<IBlogPostTransition>(`${API_URL_BLOG_POSTS}/${id}/archive`)
 
     const title = 'Manage Blog Post'
     document.title = `${title} | Admin | ${APP_NAME}`
@@ -91,7 +91,7 @@ const AdminBlogPostManage = () => {
         } else {
             hideLoading()
         }
-    }, [rejectLoading])
+    }, [hideLoading, rejectLoading, showLoading])
 
     useEffect(() => {
         if (publishLoading) {
@@ -99,7 +99,7 @@ const AdminBlogPostManage = () => {
         } else {
             hideLoading()
         }
-    }, [publishLoading])
+    }, [hideLoading, publishLoading, showLoading])
 
     useEffect(() => {
         if (archiveLoading) {
@@ -107,11 +107,10 @@ const AdminBlogPostManage = () => {
         } else {
             hideLoading()
         }
-    }, [archiveLoading])
+    }, [archiveLoading, hideLoading, showLoading])
 
     const handleBlogPostReject = () => {
-        // @ts-ignore
-        const data: IBlogPostTransition = { remarks: remarks }
+        const data: IBlogPostTransition = { remarks }
         rejectBlogPost(data)
             .then(() => {
                 showNotification('Blog post rejected.', 'success')
@@ -120,22 +119,18 @@ const AdminBlogPostManage = () => {
             .catch((error) => {
                 // Possibly add more error codes
                 if ([422].includes(error.response.status)) {
-                    showNotification(
-                        error.response.data['hydra:description'],
-                        'error'
-                    )
+                    showNotification(error.response.data.description, 'error')
                 } else {
                     showNotification(
                         'Error occurred while updating blog post',
-                        'error'
+                        'error',
                     )
                 }
             })
     }
 
     const handleBlogPostPublish = () => {
-        // @ts-ignore
-        const data: IBlogPostTransition = { remarks: remarks }
+        const data: IBlogPostTransition = { remarks }
         publishBlogPost(data)
             .then(() => {
                 showNotification('Blog post published.', 'success')
@@ -144,22 +139,18 @@ const AdminBlogPostManage = () => {
             .catch((error) => {
                 // Possibly add more error codes
                 if ([422].includes(error.response.status)) {
-                    showNotification(
-                        error.response.data['hydra:description'],
-                        'error'
-                    )
+                    showNotification(error.response.data.description, 'error')
                 } else {
                     showNotification(
                         'Error occurred while updating blog post',
-                        'error'
+                        'error',
                     )
                 }
             })
     }
 
     const handleBlogPostArchive = () => {
-        // @ts-ignore
-        const data: IBlogPostTransition = { remarks: remarks }
+        const data: IBlogPostTransition = { remarks }
         archiveBlogPost(data)
             .then(() => {
                 showNotification('Blog post archived.', 'success')
@@ -168,367 +159,372 @@ const AdminBlogPostManage = () => {
             .catch((error) => {
                 // Possibly add more error codes
                 if ([422].includes(error.response.status)) {
-                    showNotification(
-                        error.response.data['hydra:description'],
-                        'error'
-                    )
+                    showNotification(error.response.data.description, 'error')
                 } else {
                     showNotification(
                         'Error occurred while updating blog post',
-                        'error'
+                        'error',
                     )
                 }
             })
     }
 
     return (
-        <React.Fragment>
-            {blogPost && (
-                <React.Fragment>
-                    <Container
-                        data-testid="admin-blog-post-manage-content"
-                        maxWidth="md"
-                        component="main"
-                        sx={{ pt: 0, pb: 8 }}
+        blogPost && (
+            <>
+                <Container
+                    data-testid="admin-blog-post-manage-content"
+                    maxWidth="md"
+                    component="main"
+                    sx={{ pt: 0, pb: 8 }}
+                >
+                    <H1
+                        variant="h3"
+                        className="page-heading"
+                        data-testid="manage-blog-post-heading"
                     >
-                        <H1 variant="h3" data-testid="page-heading">
-                            {title}
-                        </H1>
-                        <Button
-                            data-testid="return-button"
-                            color="primary"
-                            startIcon={<ChevronLeftIcon />}
-                            sx={{ mb: 3 }}
-                            onClick={() => navigate(-1)}
-                        >
-                            Return
-                        </Button>
-                        <Box
-                            sx={{
-                                backgroundColor: 'background.paper',
-                                p: 8,
-                            }}
-                        >
-                            <form>
-                                <Grid container spacing={3}>
-                                    <Grid item xs={12} sm={4}>
-                                        <FormLabel
-                                            htmlFor="id"
-                                            data-testid="id-label"
-                                        >
-                                            ID
-                                        </FormLabel>
-                                    </Grid>
-                                    <Grid item xs={12} sm={8}>
-                                        <Input
-                                            id="id"
-                                            data-testid="id"
-                                            name="id"
-                                            value={blogPost.blogPostId}
-                                            fullWidth={true}
-                                            inputProps={{
-                                                readOnly: true,
-                                            }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                        <FormLabel
-                                            htmlFor="title"
-                                            data-testid="title-label"
-                                        >
-                                            Title
-                                        </FormLabel>
-                                    </Grid>
-                                    <Grid item xs={12} sm={8}>
-                                        <Input
-                                            id="title"
-                                            data-testid="title"
-                                            name="title"
-                                            value={blogPost.title}
-                                            fullWidth={true}
-                                            inputProps={{
-                                                readOnly: true,
-                                            }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                        <FormLabel
-                                            htmlFor="slug"
-                                            data-testid="slug-label"
-                                        >
-                                            Slug
-                                        </FormLabel>
-                                    </Grid>
-                                    <Grid item xs={12} sm={8}>
-                                        <Input
-                                            id="slug"
-                                            data-testid="slug"
-                                            name="slug"
-                                            value={blogPost.slug}
-                                            fullWidth={true}
-                                            inputProps={{
-                                                readOnly: true,
-                                            }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                        <FormLabel
-                                            htmlFor="blogCategory"
-                                            data-testid="blog-category-label"
-                                        >
-                                            Blog Category
-                                        </FormLabel>
-                                    </Grid>
-                                    <Grid item xs={12} sm={8}>
-                                        <Input
-                                            id="blogCategory"
-                                            data-testid="blog-category"
-                                            name="blogCategory"
-                                            value={
-                                                blogPost.blogCategory
-                                                    .blogCategoryName
-                                            }
-                                            fullWidth={true}
-                                            inputProps={{
-                                                readOnly: true,
-                                            }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                        <FormLabel
-                                            htmlFor="content"
-                                            data-testid="content-label"
-                                        >
-                                            Content
-                                        </FormLabel>
-                                    </Grid>
-                                    <Grid item xs={12} sm={8}>
-                                        <Input
-                                            id="content"
-                                            data-testid="content"
-                                            name="content"
-                                            value={blogPost.content}
-                                            multiline={true}
-                                            fullWidth={true}
-                                            inputProps={{
-                                                readOnly: true,
-                                            }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                        <FormLabel
-                                            htmlFor="status"
-                                            data-testid="status-label"
-                                        >
-                                            Status
-                                        </FormLabel>
-                                    </Grid>
-                                    <Grid item xs={12} sm={8}>
-                                        <ChipStatus
-                                            id="status"
-                                            statusValue={blogPost.status}
-                                            statuses={blogPostStatuses}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                        <FormLabel
-                                            htmlFor="createdBy"
-                                            data-testid="created-by-label"
-                                        >
-                                            Created By
-                                        </FormLabel>
-                                    </Grid>
-                                    <Grid item xs={12} sm={8}>
-                                        <Input
-                                            id="createdBy"
-                                            data-testid="created-by"
-                                            name="createdBy"
-                                            value={blogPost.createdBy}
-                                            fullWidth={true}
-                                            inputProps={{
-                                                readOnly: true,
-                                            }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                        <FormLabel
-                                            htmlFor="createdAt"
-                                            data-testid="created-at-label"
-                                        >
-                                            Created
-                                        </FormLabel>
-                                    </Grid>
-                                    <Grid item xs={12} sm={8}>
-                                        <Input
-                                            id="createdAt"
-                                            data-testid="created-at"
-                                            name="createdAt"
-                                            value={blogPost.createdAt}
-                                            fullWidth={true}
-                                            inputProps={{
-                                                readOnly: true,
-                                            }}
-                                        />
-                                    </Grid>
-
-                                    <Grid item xs={12} sm={4}>
-                                        <FormLabel
-                                            htmlFor="updatedBy"
-                                            data-testid="updated-by-label"
-                                        >
-                                            Updated By
-                                        </FormLabel>
-                                    </Grid>
-                                    <Grid item xs={12} sm={8}>
-                                        <Input
-                                            id="updatedBy"
-                                            data-testid="updated-by"
-                                            name="updatedBy"
-                                            value={blogPost.updatedBy}
-                                            fullWidth={true}
-                                            inputProps={{
-                                                readOnly: true,
-                                            }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}>
-                                        <FormLabel
-                                            htmlFor="updatedAt"
-                                            data-testid="updated-at-label"
-                                        >
-                                            Last updated
-                                        </FormLabel>
-                                    </Grid>
-                                    <Grid item xs={12} sm={8}>
-                                        <Input
-                                            id="updatedAt"
-                                            data-testid="updated-at"
-                                            name="updatedAt"
-                                            value={blogPost.updatedAt}
-                                            fullWidth={true}
-                                            inputProps={{
-                                                readOnly: true,
-                                            }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={4}></Grid>
-                                    <Grid item xs={12} sm={8}>
-                                        {blogPost.status === 'submitted' && (
-                                            <Button
-                                                data-testid="reject-button"
-                                                variant="contained"
-                                                color="error"
-                                                sx={{ mt: 3, mb: 2, mr: 1 }}
-                                                onClick={() =>
-                                                    setRejectDialogOpen(true)
-                                                }
-                                            >
-                                                <ThumbDownIcon />
-                                                Reject
-                                            </Button>
-                                        )}
-                                        {(blogPost.status === 'submitted' ||
-                                            blogPost.status === 'archived') && (
-                                            <Button
-                                                data-testid="publish-button"
-                                                variant="contained"
-                                                color="success"
-                                                sx={{ mt: 3, mb: 2, mr: 1 }}
-                                                onClick={() =>
-                                                    setPublishDialogOpen(true)
-                                                }
-                                            >
-                                                <PublishIcon />
-                                                Publish
-                                            </Button>
-                                        )}
-                                        {blogPost.status === 'published' && (
-                                            <Button
-                                                data-testid="archive-button"
-                                                variant="contained"
-                                                color="warning"
-                                                sx={{ mt: 3, mb: 2, mr: 1 }}
-                                                onClick={() =>
-                                                    setArchiveDialogOpen(true)
-                                                }
-                                            >
-                                                <ArchiveIcon />
-                                                Archive
-                                            </Button>
-                                        )}
-                                    </Grid>
+                        {title}
+                    </H1>
+                    <Button
+                        id="return-btn"
+                        data-testid="return-btn"
+                        color="primary"
+                        startIcon={<ChevronLeftIcon />}
+                        sx={{ mb: 3 }}
+                        onClick={() => navigate(-1)}
+                    >
+                        Return
+                    </Button>
+                    <Box
+                        sx={{
+                            backgroundColor: 'background.paper',
+                            p: 8,
+                        }}
+                    >
+                        <form>
+                            <Grid container spacing={3}>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <FormLabel
+                                        htmlFor="id"
+                                        data-testid="id-label"
+                                    >
+                                        ID
+                                    </FormLabel>
                                 </Grid>
-                            </form>
-                        </Box>
-                        <ConfirmDialog
-                            id="reject-dialog"
-                            title="Reject Blog Post"
-                            open={rejectDialogOpen}
-                            onConfirm={handleBlogPostReject}
-                            onClose={() => setRejectDialogOpen(false)}
-                        >
-                            <Paragraph>
-                                Are you sure you want to reject this blog post?
-                            </Paragraph>
-                            <TextField
-                                label="Remarks (Max 1000 characters)"
-                                multiline
-                                rows={5}
-                                fullWidth
-                                variant="outlined"
-                                inputProps={{ maxLength: 1000 }}
-                                value={remarks}
-                                onChange={(e) => setRemarks(e.target.value)}
-                            />
-                        </ConfirmDialog>
-                        <ConfirmDialog
-                            id="publish-dialog"
-                            title="Publish Blog Post"
-                            open={publishDialogOpen}
-                            onConfirm={handleBlogPostPublish}
-                            onClose={() => setPublishDialogOpen(false)}
-                        >
-                            <Paragraph>
-                                Are you sure you want to publish this blog post?
-                            </Paragraph>
-                            <TextField
-                                label="Remarks (Max 1000 characters)"
-                                multiline
-                                rows={5}
-                                fullWidth
-                                variant="outlined"
-                                inputProps={{ maxLength: 1000 }}
-                                value={remarks}
-                                onChange={(e) => setRemarks(e.target.value)}
-                            />
-                        </ConfirmDialog>
-                        <ConfirmDialog
-                            id="archive-dialog"
-                            title="Archive Blog Post"
-                            open={archiveDialogOpen}
-                            onConfirm={handleBlogPostArchive}
-                            onClose={() => setArchiveDialogOpen(false)}
-                        >
-                            <Paragraph>
-                                Are you sure you want to archive this blog post?
-                            </Paragraph>
-                            <TextField
-                                label="Remarks (Max 1000 characters)"
-                                multiline
-                                rows={5}
-                                fullWidth
-                                variant="outlined"
-                                inputProps={{ maxLength: 1000 }}
-                                value={remarks}
-                                onChange={(e) => setRemarks(e.target.value)}
-                            />
-                        </ConfirmDialog>
-                        <NotificationComponent />
-                    </Container>
-                    <AdminFooter />
-                </React.Fragment>
-            )}
-        </React.Fragment>
+                                <Grid size={{ xs: 12, sm: 8 }}>
+                                    <Input
+                                        id="id"
+                                        data-testid="id"
+                                        name="id"
+                                        value={blogPost.blogPostId}
+                                        fullWidth
+                                        inputProps={{
+                                            readOnly: true,
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <FormLabel
+                                        htmlFor="title"
+                                        data-testid="title-label"
+                                    >
+                                        Title
+                                    </FormLabel>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 8 }}>
+                                    <Input
+                                        id="title"
+                                        data-testid="title"
+                                        name="title"
+                                        value={blogPost.title}
+                                        fullWidth
+                                        inputProps={{
+                                            readOnly: true,
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <FormLabel
+                                        htmlFor="slug"
+                                        data-testid="slug-label"
+                                    >
+                                        Slug
+                                    </FormLabel>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 8 }}>
+                                    <Input
+                                        id="slug"
+                                        data-testid="slug"
+                                        name="slug"
+                                        value={blogPost.slug}
+                                        fullWidth
+                                        inputProps={{
+                                            readOnly: true,
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <FormLabel
+                                        htmlFor="blogCategory"
+                                        data-testid="blog-category-label"
+                                    >
+                                        Blog Category
+                                    </FormLabel>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 8 }}>
+                                    <Input
+                                        id="blogCategory"
+                                        data-testid="blog-category"
+                                        name="blogCategory"
+                                        value={
+                                            blogPost.blogCategory
+                                                .blogCategoryName
+                                        }
+                                        fullWidth
+                                        inputProps={{
+                                            readOnly: true,
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <FormLabel
+                                        htmlFor="content"
+                                        data-testid="content-label"
+                                    >
+                                        Content
+                                    </FormLabel>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 8 }}>
+                                    <Input
+                                        id="content"
+                                        data-testid="content"
+                                        name="content"
+                                        value={blogPost.content}
+                                        multiline
+                                        fullWidth
+                                        inputProps={{
+                                            readOnly: true,
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <FormLabel
+                                        htmlFor="status"
+                                        data-testid="status-label"
+                                    >
+                                        Status
+                                    </FormLabel>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 8 }}>
+                                    <ChipStatus
+                                        id="status"
+                                        statusValue={blogPost.status}
+                                        statuses={blogPostStatuses}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <FormLabel
+                                        htmlFor="createdBy"
+                                        data-testid="created-by-label"
+                                    >
+                                        Created By
+                                    </FormLabel>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 8 }}>
+                                    <Input
+                                        id="createdBy"
+                                        data-testid="created-by"
+                                        name="createdBy"
+                                        value={blogPost.createdBy}
+                                        fullWidth
+                                        inputProps={{
+                                            readOnly: true,
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <FormLabel
+                                        htmlFor="createdAt"
+                                        data-testid="created-at-label"
+                                    >
+                                        Created
+                                    </FormLabel>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 8 }}>
+                                    <Input
+                                        id="createdAt"
+                                        data-testid="created-at"
+                                        name="createdAt"
+                                        value={blogPost.createdAt}
+                                        fullWidth
+                                        inputProps={{
+                                            readOnly: true,
+                                        }}
+                                    />
+                                </Grid>
+
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <FormLabel
+                                        htmlFor="updatedBy"
+                                        data-testid="updated-by-label"
+                                    >
+                                        Updated By
+                                    </FormLabel>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 8 }}>
+                                    <Input
+                                        id="updatedBy"
+                                        data-testid="updated-by"
+                                        name="updatedBy"
+                                        value={blogPost.updatedBy}
+                                        fullWidth
+                                        inputProps={{
+                                            readOnly: true,
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 4 }}>
+                                    <FormLabel
+                                        htmlFor="updatedAt"
+                                        data-testid="updated-at-label"
+                                    >
+                                        Last updated
+                                    </FormLabel>
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 8 }}>
+                                    <Input
+                                        id="updatedAt"
+                                        data-testid="updated-at"
+                                        name="updatedAt"
+                                        value={blogPost.updatedAt}
+                                        fullWidth
+                                        inputProps={{
+                                            readOnly: true,
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 4 }} />
+                                <Grid size={{ xs: 12, sm: 8 }}>
+                                    {blogPost.status === 'submitted' && (
+                                        <Button
+                                            id="reject-btn"
+                                            data-testid="reject-btn"
+                                            variant="contained"
+                                            color="error"
+                                            sx={{ mt: 3, mb: 2, mr: 1 }}
+                                            onClick={() =>
+                                                setRejectDialogOpen(true)
+                                            }
+                                        >
+                                            <ThumbDownIcon />
+                                            Reject
+                                        </Button>
+                                    )}
+                                    {(blogPost.status === 'submitted' ||
+                                        blogPost.status === 'archived') && (
+                                        <Button
+                                            id="publish-btn"
+                                            data-testid="publish-btn"
+                                            variant="contained"
+                                            color="success"
+                                            sx={{ mt: 3, mb: 2, mr: 1 }}
+                                            onClick={() =>
+                                                setPublishDialogOpen(true)
+                                            }
+                                        >
+                                            <PublishIcon />
+                                            Publish
+                                        </Button>
+                                    )}
+                                    {blogPost.status === 'published' && (
+                                        <Button
+                                            id="archive-btn"
+                                            data-testid="archive-btn"
+                                            variant="contained"
+                                            color="warning"
+                                            sx={{ mt: 3, mb: 2, mr: 1 }}
+                                            onClick={() =>
+                                                setArchiveDialogOpen(true)
+                                            }
+                                        >
+                                            <ArchiveIcon />
+                                            Archive
+                                        </Button>
+                                    )}
+                                </Grid>
+                            </Grid>
+                        </form>
+                    </Box>
+                    <ConfirmDialog
+                        id="reject-blog-post-dialog"
+                        title="Reject Blog Post"
+                        open={rejectDialogOpen}
+                        onConfirm={handleBlogPostReject}
+                        onClose={() => setRejectDialogOpen(false)}
+                    >
+                        <Paragraph data-testid="reject-dialog-text">
+                            Are you sure you want to reject this blog post?
+                        </Paragraph>
+                        <TextField
+                            data-testid="remarks"
+                            label="Remarks (Max 1000 characters)"
+                            multiline
+                            rows={5}
+                            fullWidth
+                            variant="outlined"
+                            inputProps={{ maxLength: 1000 }}
+                            value={remarks}
+                            onChange={(e) => setRemarks(e.target.value)}
+                        />
+                    </ConfirmDialog>
+                    <ConfirmDialog
+                        id="publish-blog-post-dialog"
+                        title="Publish Blog Post"
+                        open={publishDialogOpen}
+                        onConfirm={handleBlogPostPublish}
+                        onClose={() => setPublishDialogOpen(false)}
+                    >
+                        <Paragraph data-testid="publish-dialog-text">
+                            Are you sure you want to publish this blog post?
+                        </Paragraph>
+                        <TextField
+                            data-testid="remarks"
+                            label="Remarks (Max 1000 characters)"
+                            multiline
+                            rows={5}
+                            fullWidth
+                            variant="outlined"
+                            inputProps={{ maxLength: 1000 }}
+                            value={remarks}
+                            onChange={(e) => setRemarks(e.target.value)}
+                        />
+                    </ConfirmDialog>
+                    <ConfirmDialog
+                        id="archive-blog-post-dialog"
+                        title="Archive Blog Post"
+                        open={archiveDialogOpen}
+                        onConfirm={handleBlogPostArchive}
+                        onClose={() => setArchiveDialogOpen(false)}
+                    >
+                        <Paragraph data-testid="archive-dialog-text">
+                            Are you sure you want to archive this blog post?
+                        </Paragraph>
+                        <TextField
+                            label="Remarks (Max 1000 characters)"
+                            multiline
+                            rows={5}
+                            fullWidth
+                            variant="outlined"
+                            inputProps={{ maxLength: 1000 }}
+                            value={remarks}
+                            onChange={(e) => setRemarks(e.target.value)}
+                        />
+                    </ConfirmDialog>
+                    <NotificationComponent />
+                </Container>
+                <AdminFooter />
+            </>
+        )
     )
 }
 

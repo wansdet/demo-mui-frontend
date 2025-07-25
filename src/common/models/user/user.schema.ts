@@ -25,6 +25,9 @@ export const userSignUpSchema = yup.object().shape({
         .string()
         .oneOf([yup.ref('password')], 'Passwords does not match')
         .required('Confirm password is required'),
+    title: yup.
+        string().
+        required('Title is required'),
     firstName: yup
         .string()
         .min(
@@ -48,7 +51,14 @@ export const userSignUpSchema = yup.object().shape({
         .required(
             'Last name is required and must be between 2 and 50 characters'
         ),
-    gender: yup.string().required('Gender is required'),
+    gender: yup.string().notRequired(),
+    displayName: yup
+        .string()
+        .max(20, 'Display name is required and must be less than 20 characters')
+        .min(6, 'Display name is required and must be more than 6 characters')
+        .required(
+            'Display name is required and must be between 6 and 20 characters'
+        ),
 })
 
 export const userUKAddressSchema = yup.object().shape({
@@ -103,6 +113,9 @@ export const userUKAddressSchema = yup.object().shape({
 export const userUpdateSchema = yup.object().shape({
     id: yup.string().required('User id is required'),
     displayName: yup.string().required('Username is required'),
+    title: yup.
+        string().
+        required('Title is required'),
     firstName: yup
         .string()
         .min(
@@ -130,7 +143,7 @@ export const userUpdateSchema = yup.object().shape({
         .string()
         .max(50, 'Middle name must be less than 50 characters')
         .notRequired(),
-    sex: yup.string().required('Gender is required'),
+    gender: yup.string().notRequired(),
     email: yup
         .string()
         .email()
@@ -141,12 +154,19 @@ export const userUpdateSchema = yup.object().shape({
     jobTitle: yup
         .string()
         .max(30, 'Job title must be less than 30 characters')
-        .required('Job title must be less than 30 characters'),
+        .notRequired(),
     roles: yup.array().of(yup.string()).required('Roles is required'),
     status: yup.string().required('Status is required'),
 })
 
 export const userAccountUpdateSchema = yup.object().shape({
+    displayName: yup
+        .string(),
+    email: yup
+        .string(),
+    title: yup.
+        string().
+        required('Title is required'),
     firstName: yup
         .string()
         .min(
@@ -174,11 +194,13 @@ export const userAccountUpdateSchema = yup.object().shape({
         .string()
         .max(50, 'Middle name must be less than 50 characters')
         .notRequired(),
-    sex: yup.string().required('Gender is required'),
+    gender: yup.string().notRequired(),
     jobTitle: yup
         .string()
         .max(30, 'Job title must be less than 30 characters')
         .notRequired(),
+    status: yup
+        .string()
 })
 
 export const userPasswordChangeSchema = yup.object().shape({

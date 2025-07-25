@@ -1,10 +1,8 @@
 import React from 'react'
 import {
-    Paper,
     Table,
     TableBody,
     TableCell,
-    TableContainer,
     TableRow,
 } from '@mui/material'
 import EmailIcon from '@mui/icons-material/Email'
@@ -13,9 +11,8 @@ import PhoneIcon from '@mui/icons-material/Phone'
 
 import { H3 } from '@/components/data-display'
 
-const ContactUs = () => {
-    return (
-        <React.Fragment>
+const ContactUs = () => (
+        <>
             <H3>Contact Us</H3>
 
             <Table size="small" aria-label="contact us">
@@ -77,8 +74,7 @@ const ContactUs = () => {
                     </TableRow>
                 </TableBody>
             </Table>
-        </React.Fragment>
+        </>
     )
-}
 
 export default ContactUs

@@ -1,4 +1,4 @@
-export const ukCounties = [
+const ukCounties = [
     {
         countyCode: 'bedfordshire',
         countyName: 'Bedfordshire',
@@ -192,3 +192,5 @@ export const ukCounties = [
         countyName: 'Worcestershire',
     },
 ]
+
+export default ukCounties

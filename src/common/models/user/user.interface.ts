@@ -15,11 +15,12 @@ export interface IUser {
     userId: string
     email: string
     displayName?: string
+    title: string
     firstName: string
     lastName: string
     middleName?: string
     roles: string[]
-    sex: string
+    gender?: string
     jobTitle?: string
     status: string
     description?: string
@@ -32,10 +33,11 @@ export interface IUser {
 export interface IUserPublic {
     id?: number
     userId: string
+    title: string
     firstName: string
     lastName: string
     jobTitle?: string
-    sex: string
+    gender?: string
     description?: string
 }
 

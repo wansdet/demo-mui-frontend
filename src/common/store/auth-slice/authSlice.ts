@@ -2,32 +2,36 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { IUserAuth } from '@/common/models/user'
 
-interface UserState {
+// 1. State interface
+export interface UserState {
     user: IUserAuth | null
     isAuthenticated: boolean
 }
 
+// 2. Initial state
 const initialState: UserState = {
     user: null,
     isAuthenticated: false,
 }
 
+// 3. Slice
 const authSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        // Actions
-        setAuth: (state, action: PayloadAction<IUserAuth>) => {
+        setAuth(state, action: PayloadAction<IUserAuth>) {
             state.user = action.payload
             state.isAuthenticated = true
         },
-        resetAuth: (state) => {
+        resetAuth(state) {
             state.user = null
             state.isAuthenticated = false
         },
     },
 })
 
-export const { setAuth } = authSlice.actions
-export const { resetAuth } = authSlice.actions
+// 4. Export actions
+export const { setAuth, resetAuth } = authSlice.actions
+
+// 5. Export reducer only
 export default authSlice.reducer

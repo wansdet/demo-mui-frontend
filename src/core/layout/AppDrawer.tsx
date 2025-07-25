@@ -1,5 +1,5 @@
 import React, { ReactNode, useContext, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { styled, useTheme } from '@mui/material/styles'
 import {
     Divider,
@@ -29,7 +29,7 @@ import Toolbar from '@mui/material/Toolbar'
 import ViewListIcon from '@mui/icons-material/ViewList'
 
 import { SecurityContext } from '@/core/security'
-import { DrawerHeader } from '@/core/layout'
+import DrawerHeader from '@/core/layout/DrawerHeader'
 import {
     IListItem,
     homeItems,
@@ -40,7 +40,7 @@ import {
     adminBlogListItems,
 } from './app-drawer-list-items'
 
-const appTitle = 'Demo App'
+const appTitle = 'DemoApp'
 const drawerWidth = 330
 
 const appPages = [
@@ -97,10 +97,10 @@ export default function AppDrawer({ children }: { children: ReactNode }) {
     const [open, setOpen] = React.useState(false)
     const [selectedIndex, setSelectedIndex] = useState(0)
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-        null
+        null,
     )
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
-        null
+        null,
     )
 
     const auth = useContext(SecurityContext)
@@ -170,6 +170,7 @@ export default function AppDrawer({ children }: { children: ReactNode }) {
                         sx={{ display: 'block' }}
                     >
                         <ListItemButton
+                            id={item.testId}
                             data-testid={item.testId}
                             component={Link}
                             to={item.path}
@@ -197,7 +198,7 @@ export default function AppDrawer({ children }: { children: ReactNode }) {
 
     const handleListItemClick = (
         event: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-        index: number
+        index: number,
     ) => {
         setSelectedIndex(index)
     }
@@ -219,7 +220,12 @@ export default function AppDrawer({ children }: { children: ReactNode }) {
 
     return (
         <React.Fragment>
-            <AppBar data-testid="app-bar" position="fixed" open={open}>
+            <AppBar
+                id="app-bar"
+                data-testid="app-bar"
+                position="fixed"
+                open={open}
+            >
                 <Toolbar>
                     {auth.user && auth.hasRole('ROLE_ADMIN') && (
                         <IconButton
@@ -254,7 +260,7 @@ export default function AppDrawer({ children }: { children: ReactNode }) {
                                 style={{ textDecoration: 'none' }}
                             >
                                 <Button
-                                    data-testid={`${page.id}-button`}
+                                    data-testid={`${page.id}-btn`}
                                     onClick={handleCloseNavMenu}
                                     sx={{
                                         my: 2,
@@ -273,7 +279,7 @@ export default function AppDrawer({ children }: { children: ReactNode }) {
                                 style={{ textDecoration: 'none' }}
                             >
                                 <Button
-                                    data-testid="sign-up-button"
+                                    data-testid="sign-up-btn"
                                     onClick={handleCloseNavMenu}
                                     sx={{
                                         my: 2,
@@ -301,7 +307,7 @@ export default function AppDrawer({ children }: { children: ReactNode }) {
                                     style={{ textDecoration: 'none' }}
                                 >
                                     <Button
-                                        data-testid="my-account-button"
+                                        data-testid="my-account-btn"
                                         onClick={handleCloseNavMenu}
                                         sx={{
                                             my: 2,
@@ -321,7 +327,7 @@ export default function AppDrawer({ children }: { children: ReactNode }) {
                                 style={{ textDecoration: 'none' }}
                             >
                                 <Button
-                                    data-testid="admin-button"
+                                    data-testid="admin-btn"
                                     onClick={handleCloseNavMenu}
                                     sx={{
                                         my: 2,
@@ -340,7 +346,7 @@ export default function AppDrawer({ children }: { children: ReactNode }) {
                                 style={{ textDecoration: 'none' }}
                             >
                                 <Button
-                                    data-testid="sign-in-button"
+                                    data-testid="sign-in-btn"
                                     onClick={handleCloseNavMenu}
                                     sx={{
                                         my: 2,
@@ -359,7 +365,7 @@ export default function AppDrawer({ children }: { children: ReactNode }) {
                                 style={{ textDecoration: 'none' }}
                             >
                                 <Button
-                                    data-testid="sign-out-button"
+                                    data-testid="sign-out-btn"
                                     onClick={handleCloseNavMenu}
                                     sx={{
                                         my: 2,
@@ -413,58 +419,57 @@ export default function AppDrawer({ children }: { children: ReactNode }) {
                     </Box>
                 </Toolbar>
             </AppBar>
-            <Drawer
-                data-testid="app-drawer"
-                sx={{
-                    width: drawerWidth,
-                    flexShrink: 0,
-                    '& .MuiDrawer-paper': {
+            {hasAdministrativeRole() && (
+                <Drawer
+                    id="app-drawer"
+                    data-testid="app-drawer"
+                    sx={{
                         width: drawerWidth,
-                        boxSizing: 'border-box',
-                    },
-                }}
-                variant="persistent"
-                anchor="left"
-                open={open}
-            >
-                {hasAdministrativeRole() && (
-                    <React.Fragment>
-                        <DrawerHeader>
-                            <IconButton onClick={handleDrawerClose}>
-                                {theme.direction === 'ltr' ? (
-                                    <ChevronLeftIcon />
-                                ) : (
-                                    <ChevronRightIcon />
-                                )}
-                            </IconButton>
-                        </DrawerHeader>
-                        <Divider />
-                        {ListItems(homeItems)}
-                        <Divider />
-                        {ListItems(userListItems)}
-                        {auth.hasRole('ROLE_BLOGGER') && (
-                            <React.Fragment>
-                                <Divider />
-                                {ListItems(bloggerListItems)}
-                            </React.Fragment>
-                        )}
-                        {hasBlogAdminRole() && (
-                            <React.Fragment>
-                                <Divider />
-                                {ListItems(adminBlogListItems)}
-                            </React.Fragment>
-                        )}
-                        {auth.hasRole('ROLE_ADMIN') && (
-                            <React.Fragment>
-                                <Divider />
-                                {ListItems(adminUsersListItems)}
-                            </React.Fragment>
-                        )}
-                        <Divider />
-                        {ListItems(adminReportsListItems)}
-                    </React.Fragment>
-                )}
-            </Drawer>
+                        flexShrink: 0,
+                        '& .MuiDrawer-paper': {
+                            width: drawerWidth,
+                            boxSizing: 'border-box',
+                        },
+                    }}
+                    variant="persistent"
+                    anchor="left"
+                    open={open}
+                >
+                    <DrawerHeader>
+                        <IconButton onClick={handleDrawerClose}>
+                            {theme.direction === 'ltr' ? (
+                                <ChevronLeftIcon />
+                            ) : (
+                                <ChevronRightIcon />
+                            )}
+                        </IconButton>
+                    </DrawerHeader>
+                    <Divider />
+                    {ListItems(homeItems)}
+                    <Divider />
+                    {ListItems(userListItems)}
+                    {auth.hasRole('ROLE_BLOGGER') && (
+                        <>
+                            <Divider />
+                            {ListItems(bloggerListItems)}
+                        </>
+                    )}
+                    {hasBlogAdminRole() && (
+                        <React.Fragment>
+                            <Divider />
+                            {ListItems(adminBlogListItems)}
+                        </React.Fragment>
+                    )}
+                    {auth.hasRole('ROLE_ADMIN') && (
+                        <React.Fragment>
+                            <Divider />
+                            {ListItems(adminUsersListItems)}
+                        </React.Fragment>
+                    )}
+                    <Divider />
+                    {ListItems(adminReportsListItems)}
+                </Drawer>
+            )}
             <Main open={open}>
                 <DrawerHeader />
                 {children}

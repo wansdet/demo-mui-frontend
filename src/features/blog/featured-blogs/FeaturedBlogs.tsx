@@ -8,7 +8,7 @@ import {
     BASE_IMAGE_ASSETS_URL,
 } from '@/core/application'
 import { useApiGet } from '@/core/api'
-import { Footer } from '@/core/layout'
+import Footer from '@/core/layout/Footer'
 import { IImage } from '@/common'
 import { IBlogPost } from '@/common/models/blog'
 import { H3, H1 } from '@/components/data-display'
@@ -55,25 +55,33 @@ const FeaturedBlogs = () => {
         } else {
             hideLoading()
         }
-    }, [getLoading])
+    }, [getLoading, hideLoading, showLoading])
 
     return (
-        <React.Fragment>
+        <>
             <CssBaseline />
-            <Container maxWidth="lg" component="main" sx={{ pt: 0, pb: 8 }}>
-                <H1 data-testid="blog-posts-list-heading">Blog</H1>
+            <Container
+                id="featured-blog-posts-container"
+                maxWidth="lg"
+                component="main"
+                sx={{ pt: 0, pb: 8 }}
+            >
+                <H1
+                    className="page-heading"
+                    data-testid="featured-blogs-list-heading"
+                >
+                    Blog
+                </H1>
                 <Grid container spacing={8}>
                     <Grid
                         data-testid="blog-posts-list-main-content"
-                        item
-                        xs={12}
-                        md={8}
+                        size={{ xs: 12, md: 8 }}
                     >
                         {blogPosts.length > 0 && (
                             <BlogPostsCardList blogPosts={blogPosts} />
                         )}
                     </Grid>
-                    <SideBar>
+                    <SideBar id="featured-blog-posts-sidebar">
                         <aside>
                             <BlogCategories />
                             <BlogAuthorsList />
@@ -86,7 +94,7 @@ const FeaturedBlogs = () => {
                 </Grid>
             </Container>
             <Footer />
-        </React.Fragment>
+        </>
     )
 }
 

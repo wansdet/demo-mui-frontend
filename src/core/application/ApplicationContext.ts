@@ -6,5 +6,5 @@ interface IApplicationContext {
 }
 
 export const ApplicationContext = createContext<IApplicationContext>(
-    {} as IApplicationContext
+    {} as IApplicationContext,
 )

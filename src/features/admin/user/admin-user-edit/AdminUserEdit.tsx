@@ -1,6 +1,5 @@
 import React, { ReactNode, useContext, useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import Axios from 'axios'
+import { useNavigate, useParams } from 'react-router'
 import {
     Box,
     Button,
@@ -14,12 +13,11 @@ import {
     SelectChangeEvent,
 } from '@mui/material'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
-import { Controller, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 
-import { SecurityContext } from '@/core/security'
 import { ApplicationContext, API_URL_USERS } from '@/core/application'
-import { useApiGet, useApiPut } from '@/core/api'
+import { useApiGet, useApiPatch } from '@/core/api'
 import { AdminFooter } from '@/core/layout'
 import useNotification from '@/common/hooks/feedback/useNotification'
 import {
@@ -35,15 +33,15 @@ import { H1 } from '@/components/data-display'
 const AdminUserEdit = () => {
     const { id } = useParams()
     const [user, setUser] = useState<IUserUpdate | null>(null)
-    const [loading, setLoading] = useState(false)
     const { showNotification, NotificationComponent } = useNotification()
-
-    const { authHeader } = useContext(SecurityContext)
-    const headers = authHeader()
-
     const { data: fetchedUser } = useApiGet<IUserUpdate>(
-        `${API_URL_USERS}/${id}`
+        `${API_URL_USERS}/${id}`,
     )
+    const {
+        patchData: updatedUser,
+        loading: getLoading,
+        error: getError,
+    } = useApiPatch<IUserUpdate>(`${API_URL_USERS}/${id}`)
 
     const { showLoading, hideLoading } = useContext(ApplicationContext)
     const navigate = useNavigate()
@@ -64,12 +62,12 @@ const AdminUserEdit = () => {
     }, [fetchedUser])
 
     useEffect(() => {
-        if (loading) {
+        if (getLoading) {
             showLoading()
         } else {
             hideLoading()
         }
-    }, [loading])
+    }, [getLoading, hideLoading, showLoading])
 
     const onSubmit = (data: any) => {
         const formData = {
@@ -77,25 +75,18 @@ const AdminUserEdit = () => {
             middleName: data.middleName ? data.middleName : null,
         }
 
-        setLoading(true)
-
-        Axios.put(`${API_URL_USERS}/${id}`, formData, { headers })
-            .then((response) => {
-                setLoading(false)
-                setUser(response.data)
+        updatedUser(formData)
+            .then(() => {
                 showNotification('User successfully updated', 'success')
             })
             .catch((error) => {
-                setLoading(false)
+                // Possibly add more error codes
                 if ([422].includes(error.response.status)) {
-                    showNotification(
-                        error.response.data['hydra:description'],
-                        'error'
-                    )
+                    showNotification(error.response.data.description, 'error')
                 } else {
                     showNotification(
                         'Error occurred while updating user',
-                        'error'
+                        'error',
                     )
                 }
             })
@@ -103,7 +94,7 @@ const AdminUserEdit = () => {
 
     const handleChangeMultiple = (
         event: SelectChangeEvent<string[]>,
-        child: ReactNode
+        child: ReactNode,
     ) => {
         // @ts-ignore
         const { options } = event.target
@@ -115,11 +106,10 @@ const AdminUserEdit = () => {
         }
     }
 
-    // @ts-ignore
     return (
-        <React.Fragment>
+        <>
             {user && (
-                <React.Fragment>
+                <>
                     <Container
                         data-testid="admin-user-edit-content"
                         maxWidth="md"
@@ -130,7 +120,7 @@ const AdminUserEdit = () => {
                             User: {user.firstName} {user.lastName}
                         </H1>
                         <Button
-                            data-testid="return-button"
+                            data-testid="return-btn"
                             color="primary"
                             startIcon={<ChevronLeftIcon />}
                             sx={{ mb: 3 }}
@@ -141,7 +131,7 @@ const AdminUserEdit = () => {
                         <Box sx={{ backgroundColor: 'background.paper', p: 8 }}>
                             <form onSubmit={handleSubmit(onSubmit)}>
                                 <Grid container spacing={3}>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
                                         <FormLabel
                                             htmlFor="id"
                                             data-testid="id-label"
@@ -149,7 +139,7 @@ const AdminUserEdit = () => {
                                             ID
                                         </FormLabel>
                                     </Grid>
-                                    <Grid item xs={12} sm={8}>
+                                    <Grid size={{ xs: 12, sm: 8 }}>
                                         <FormInput
                                             name="id"
                                             data-testid="id"
@@ -157,14 +147,14 @@ const AdminUserEdit = () => {
                                             type="text"
                                             errors={errors}
                                             defaultValue={user.userId}
-                                            fullWidth={true}
+                                            fullWidth
                                             inputProps={{
                                                 readOnly: true,
                                             }}
                                             sx={{ m: 0, p: 0 }}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
                                         <FormLabel
                                             htmlFor="displayName"
                                             data-testid="display-name-label"
@@ -172,7 +162,7 @@ const AdminUserEdit = () => {
                                             Display name
                                         </FormLabel>
                                     </Grid>
-                                    <Grid item xs={12} sm={8}>
+                                    <Grid size={{ xs: 12, sm: 8 }}>
                                         <FormInput
                                             name="displayName"
                                             data-testid="display-name"
@@ -180,14 +170,37 @@ const AdminUserEdit = () => {
                                             type="text"
                                             errors={errors}
                                             defaultValue={user.displayName}
-                                            fullWidth={true}
+                                            fullWidth
                                             inputProps={{
                                                 readOnly: true,
                                             }}
                                             sx={{ m: 0, p: 0 }}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
+                                        <FormLabel
+                                            htmlFor="title"
+                                            data-testid="title-label"
+                                        >
+                                            Title
+                                        </FormLabel>
+                                    </Grid>
+                                    <Grid size={{ xs: 12, sm: 8 }}>
+                                        <FormInput
+                                            name="title"
+                                            data-testid="title"
+                                            control={control}
+                                            type="text"
+                                            errors={errors}
+                                            defaultValue={user.title}
+                                            fullWidth
+                                            inputProps={{
+                                                readOnly: true,
+                                            }}
+                                            sx={{ m: 0, p: 0 }}
+                                        />
+                                    </Grid>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
                                         <FormLabel
                                             htmlFor="firstName"
                                             data-testid="first-name-label"
@@ -195,7 +208,7 @@ const AdminUserEdit = () => {
                                             First name
                                         </FormLabel>
                                     </Grid>
-                                    <Grid item xs={12} sm={8}>
+                                    <Grid size={{ xs: 12, sm: 8 }}>
                                         <FormInput
                                             name="firstName"
                                             data-testid="first-name"
@@ -203,14 +216,14 @@ const AdminUserEdit = () => {
                                             type="text"
                                             errors={errors}
                                             defaultValue={user.firstName}
-                                            fullWidth={true}
+                                            fullWidth
                                             inputProps={{
                                                 readOnly: true,
                                             }}
                                             sx={{ m: 0, p: 0 }}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
                                         <FormLabel
                                             htmlFor="lastName"
                                             data-testid="last-name-label"
@@ -218,7 +231,7 @@ const AdminUserEdit = () => {
                                             Last name
                                         </FormLabel>
                                     </Grid>
-                                    <Grid item xs={12} sm={8}>
+                                    <Grid size={{ xs: 12, sm: 8 }}>
                                         <FormInput
                                             data-testid="last-name"
                                             name="lastName"
@@ -226,14 +239,14 @@ const AdminUserEdit = () => {
                                             type="text"
                                             errors={errors}
                                             defaultValue={user.lastName}
-                                            fullWidth={true}
+                                            fullWidth
                                             inputProps={{
                                                 readOnly: true,
                                             }}
                                             sx={{ m: 0, p: 0 }}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
                                         <FormLabel
                                             htmlFor="middleName"
                                             data-testid="middle-name-label"
@@ -241,7 +254,7 @@ const AdminUserEdit = () => {
                                             Middle name
                                         </FormLabel>
                                     </Grid>
-                                    <Grid item xs={12} sm={8}>
+                                    <Grid size={{ xs: 12, sm: 8 }}>
                                         <FormInput
                                             data-testid="middle-name"
                                             name="middleName"
@@ -249,49 +262,49 @@ const AdminUserEdit = () => {
                                             type="text"
                                             errors={errors}
                                             defaultValue={user.middleName}
-                                            fullWidth={true}
+                                            fullWidth
                                             inputProps={{
                                                 readOnly: true,
                                             }}
                                             sx={{ m: 0, p: 0 }}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
                                         <FormLabel
-                                            htmlFor="sex"
-                                            data-testid="sex-label"
+                                            htmlFor="gender"
+                                            data-testid="gender-label"
                                         >
                                             Gender
                                         </FormLabel>
                                     </Grid>
-                                    <Grid item xs={12} sm={8}>
+                                    <Grid size={{ xs: 12, sm: 8 }}>
                                         <FormSelect
-                                            data-testid="sex"
-                                            name="sex"
+                                            data-testid="gender"
+                                            name="gender"
                                             label=""
                                             control={control}
                                             errors={errors}
-                                            defaultValue={user.sex}
+                                            defaultValue={user.gender}
                                             inputProps={{
                                                 readOnly: true,
                                             }}
                                             sx={{ my: 0 }}
                                         >
                                             {genderOptions.map(
-                                                (genderOption, index) => (
+                                                (genderOption) => (
                                                     <MenuItem
-                                                        key={index}
+                                                        key={genderOption.value}
                                                         value={
                                                             genderOption.value
                                                         }
                                                     >
                                                         {genderOption.label}
                                                     </MenuItem>
-                                                )
+                                                ),
                                             )}
                                         </FormSelect>
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
                                         <FormLabel
                                             htmlFor="email"
                                             data-testid="email-label"
@@ -299,7 +312,7 @@ const AdminUserEdit = () => {
                                             Email
                                         </FormLabel>
                                     </Grid>
-                                    <Grid item xs={12} sm={8}>
+                                    <Grid size={{ xs: 12, sm: 8 }}>
                                         <FormInput
                                             data-testid="email"
                                             name="email"
@@ -307,14 +320,14 @@ const AdminUserEdit = () => {
                                             type="text"
                                             errors={errors}
                                             defaultValue={user.email}
-                                            fullWidth={true}
+                                            fullWidth
                                             inputProps={{
                                                 readOnly: true,
                                             }}
                                             sx={{ m: 0, p: 0 }}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
                                         <FormLabel
                                             htmlFor="jobTitle"
                                             data-testid="job-title-label"
@@ -322,7 +335,7 @@ const AdminUserEdit = () => {
                                             Job title
                                         </FormLabel>
                                     </Grid>
-                                    <Grid item xs={12} sm={8}>
+                                    <Grid size={{ xs: 12, sm: 8 }}>
                                         <FormInput
                                             data-testid="job-title"
                                             name="jobTitle"
@@ -330,14 +343,14 @@ const AdminUserEdit = () => {
                                             type="text"
                                             errors={errors}
                                             defaultValue={user.jobTitle}
-                                            fullWidth={true}
+                                            fullWidth
                                             inputProps={{
                                                 readOnly: true,
                                             }}
                                             sx={{ m: 0, p: 0 }}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
                                         <FormLabel
                                             htmlFor="roles"
                                             data-testid="roles-label"
@@ -345,13 +358,13 @@ const AdminUserEdit = () => {
                                             Roles
                                         </FormLabel>
                                     </Grid>
-                                    <Grid item xs={12} sm={8}>
+                                    <Grid size={{ xs: 12, sm: 8 }}>
                                         <FormControl fullWidth>
                                             <Select
                                                 data-testid="roles"
                                                 defaultValue={
                                                     user.roles.filter(
-                                                        Boolean
+                                                        Boolean,
                                                     ) as string[]
                                                 } // Filter and cast to string[]
                                                 {...register('roles')}
@@ -361,9 +374,11 @@ const AdminUserEdit = () => {
                                                 onChange={handleChangeMultiple}
                                             >
                                                 {userRoles.map(
-                                                    (userRoleOption, index) => (
+                                                    (userRoleOption) => (
                                                         <option
-                                                            key={index}
+                                                            key={
+                                                                userRoleOption.value
+                                                            }
                                                             value={
                                                                 userRoleOption.value
                                                             }
@@ -372,12 +387,12 @@ const AdminUserEdit = () => {
                                                                 userRoleOption.label
                                                             }
                                                         </option>
-                                                    )
+                                                    ),
                                                 )}
                                             </Select>
                                         </FormControl>
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
                                         <FormLabel
                                             htmlFor="status"
                                             data-testid="status-label"
@@ -385,7 +400,7 @@ const AdminUserEdit = () => {
                                             Status
                                         </FormLabel>
                                     </Grid>
-                                    <Grid item xs={12} sm={8}>
+                                    <Grid size={{ xs: 12, sm: 8 }}>
                                         <FormSelect
                                             data-testid="status"
                                             name="status"
@@ -396,20 +411,20 @@ const AdminUserEdit = () => {
                                             sx={{ my: 0 }}
                                         >
                                             {userStatuses.map(
-                                                (statusOption, index) => (
+                                                (statusOption) => (
                                                     <MenuItem
-                                                        key={index}
+                                                        key={statusOption.value}
                                                         value={
                                                             statusOption.value
                                                         }
                                                     >
                                                         {statusOption.label}
                                                     </MenuItem>
-                                                )
+                                                ),
                                             )}
                                         </FormSelect>
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
                                         <FormLabel
                                             htmlFor="createdBy"
                                             data-testid="created-by-label"
@@ -417,19 +432,19 @@ const AdminUserEdit = () => {
                                             Created By
                                         </FormLabel>
                                     </Grid>
-                                    <Grid item xs={12} sm={8}>
+                                    <Grid size={{ xs: 12, sm: 8 }}>
                                         <Input
                                             id="createdBy"
                                             data-testid="created-by"
                                             name="createdBy"
                                             value={user.createdBy}
-                                            fullWidth={true}
+                                            fullWidth
                                             inputProps={{
                                                 readOnly: true,
                                             }}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
                                         <FormLabel
                                             htmlFor="createdAt"
                                             data-testid="created-at-label"
@@ -437,20 +452,20 @@ const AdminUserEdit = () => {
                                             Created
                                         </FormLabel>
                                     </Grid>
-                                    <Grid item xs={12} sm={8}>
+                                    <Grid size={{ xs: 12, sm: 8 }}>
                                         <Input
                                             id="createdAt"
                                             data-testid="created-at"
                                             name="createdAt"
                                             value={user.createdAt}
-                                            fullWidth={true}
+                                            fullWidth
                                             inputProps={{
                                                 readOnly: true,
                                             }}
                                         />
                                     </Grid>
 
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
                                         <FormLabel
                                             htmlFor="updatedBy"
                                             data-testid="updated-by-label"
@@ -458,19 +473,19 @@ const AdminUserEdit = () => {
                                             Updated By
                                         </FormLabel>
                                     </Grid>
-                                    <Grid item xs={12} sm={8}>
+                                    <Grid size={{ xs: 12, sm: 8 }}>
                                         <Input
                                             id="updatedBy"
                                             data-testid="updated-by"
                                             name="updatedBy"
                                             value={user.updatedBy}
-                                            fullWidth={true}
+                                            fullWidth
                                             inputProps={{
                                                 readOnly: true,
                                             }}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={4}>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
                                         <FormLabel
                                             htmlFor="updatedAt"
                                             data-testid="updated-at-label"
@@ -478,22 +493,22 @@ const AdminUserEdit = () => {
                                             Last updated
                                         </FormLabel>
                                     </Grid>
-                                    <Grid item xs={12} sm={8}>
+                                    <Grid size={{ xs: 12, sm: 8 }}>
                                         <Input
                                             id="updatedAt"
                                             data-testid="updated-at"
                                             name="updatedAt"
                                             value={user.updatedAt}
-                                            fullWidth={true}
+                                            fullWidth
                                             inputProps={{
                                                 readOnly: true,
                                             }}
                                         />
                                     </Grid>
-                                    <Grid item xs={12} sm={4}></Grid>
-                                    <Grid item xs={12} sm={8}>
+                                    <Grid size={{ xs: 12, sm: 4 }}></Grid>
+                                    <Grid size={{ xs: 12, sm: 8 }}>
                                         <ButtonSubmit
-                                            data-testid="submit-button"
+                                            data-testid="submit-btn"
                                             sx={{ mt: 3, mb: 2 }}
                                         >
                                             Submit
@@ -505,9 +520,9 @@ const AdminUserEdit = () => {
                         <NotificationComponent />
                     </Container>
                     <AdminFooter />
-                </React.Fragment>
+                </>
             )}
-        </React.Fragment>
+        </>
     )
 }
 
